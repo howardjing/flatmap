@@ -7,6 +7,7 @@
     "start": "webpack-serve"
   },
   "devDependencies": {
+    "babel-loader": "^7.1.4",
     "babel-preset-env": "^1.7.0",
     "babel-preset-flow": "^6.23.0",
     "flow-bin": "^0.73.0",
@@ -14,5 +15,8 @@
     "webpack": "^4.10.1",
     "webpack-cli": "^2.1.4",
     "webpack-serve": "^1.0.2"
+  },
+  "dependencies": {
+    "d3": "^5.4.0"
   }
 }
