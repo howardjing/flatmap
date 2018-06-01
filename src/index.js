@@ -1,5 +1,7 @@
 // @flow
 import * as d3 from 'd3';
+import { TweenLite } from 'gsap/TweenLite';
+import CSSPlugin from 'gsap/CSSPlugin';
 
 const numberBetween = (min: number, max: number) =>
   Math.floor(Math.random() * max) + min + 1;
@@ -21,14 +23,25 @@ const render = (data: number[]) => {
   .data(data)
   .text(renderDigit);
 
+  console.log("HEY P", p)
+
   p.enter()
     .append("p")
-    .text(renderDigit);
+    .text(renderDigit)
+    .each(function() {
+      TweenLite.to(this, 1, { height: '30px', opacity: 1 });
+    });
 
   p.exit()
-    .remove();
-  }
+    .remove()
+    // i think this is executed after it's been removed from DOM?
+    .each(function() {
+      console.log("EXIT", this)
+      TweenLite.to(this, 1, { height: '20px', opacity: 0 });
+    });
+}
+
 
 render(someNumbers());
 
-setInterval(() => render(someNumbers()), 1000);
+setInterval(() => render(someNumbers()), 2000);
