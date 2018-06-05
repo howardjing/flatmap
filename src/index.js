@@ -18,7 +18,7 @@ const someNumbers = (): number[] => {
 }
 
 const render = (data: number[]) => {
-  const p = d3.select("body")
+  const p = d3.select("#app")
   .selectAll("p")
   .data(data)
   .text(renderDigit)

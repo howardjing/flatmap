@@ -9,7 +9,10 @@ module.exports = {
     filename: 'index_bundle.js'
   },
   plugins: [
-    new HtmlWebpackPlugin()
+    new HtmlWebpackPlugin({
+      title: "stuff and things",
+      template: "src/index.html.ejs",
+    })
   ],
   module: {
     rules: [
