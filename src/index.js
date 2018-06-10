@@ -57,4 +57,4 @@ const render = (data: number[]) => {
 
 render(someNumbers());
 
-d3.interval(() => render(someNumbers()), 2000);
+// d3.interval(() => rener(someNumbers()), 2000);
