@@ -2,7 +2,7 @@
 
 One thing I hated when learning to program was loops. Loops are repetitive. Most of the time all you're really doing is iterating through elements of a list, performing some transformation on them, and then shoving the result into another list. You can only do this so many times before you lose your mind. Luckily, there is a better way.
 
-## List World
+## Some Background -- List World
 
 TODO: insert diagram showing oval with triangles with various hatch fills inside
 
@@ -22,13 +22,13 @@ Success! We've transmogrified the triangle into a square, all while preserving h
 
 ```js
 const squares = [];
-triangles.forEach(triangle => {
+triangles.forEach((triangle) => {
   const square = transmogrifyTriangle(triangle);
   squares.push(circle);
 });
 ```
 
-Once it finishes running, we'll have the desired list of squares. Can we do this in a more concise way? Yes, using `map`.
+Once it finishes running, we'll have the desired list of squares. Can we do this more concisely? Yes, using `map`.
 
 TODO: insert diagram showing `map<T, U>(list: List<T>, mapper(t: T) => U): List<U>`
 
@@ -48,18 +48,18 @@ or even simpler:
 const squares = map(triangles, transmogrifyTriangle);
 ```
 
-By using `map` instead of a loop we've become more concise. We've abstracted out the pattern of looping through something, running a function against each element, and returning the accumulated results. Here is how one might implement `map` by hand.
+By using `map` instead of a loop we've become more concise. We've abstracted the pattern of looping through something, running a function against each element, and returning the accumulated results. Here is how one might implement `map` by hand.
 
 ```js
 const map = (list, mapper) => {
   const results = [];
-  list.forEach(thing => {
+  list.forEach((thing) => {
     const result = mapper(thing);
     results.push(result);
   });
 
   return results;
-}
+};
 ```
 
 Notice how similar it is in structure to how we originally generated the list of squares. Instead of verbosely looping through a list to transform each value of that list into another value, let's use the more concise `map`.
@@ -70,19 +70,74 @@ Notice how similar it is in structure to how we originally generated the list of
 
 TODO: insert diagram showing `isEven(square) -> boolean`
 
-Our evenness divinator is very wise. If it is given a shape with even angled hatch marks, it will say `true`. If it is given a shape with odd angled hatch marks, it will say `false`. How can we use our divinator to only include evenly hatched squares? Here is one approach:
+Our evenness divinator is very wise. If it is given a shape with even angled hatch marks, it will say, "True". If it is given a shape with odd angled hatch marks, it will say, "False." How can we use our divinator to only include evenly hatched squares? Here is one approach:
 
 
 ```js
-const evenSquares = [];
-squares.forEach(square => {
+const evenlyHatchedSquares = [];
+squares.forEach((square) => {
   if (isEven(square)) {
-    evenSquares.push(square);
+    evenlyHatchedSquares.push(square);
   }
 });
 ```
 
-Once it finished running, we'll have our list of evenly hatched squares. Can we do this in a more concise way? Yes, using `filter`.
+Once it finished running, we'll have our list of evenly hatched squares. Can we do this more concisely? Yes, using `filter`.
 
 TODO: insert diagram showing `map<T>(list: List<T>, predicate(t: T) => boolean): List<T>
+
+Like `map`, filter also takes two parameters. The first is our list. The second is a predicate function, in our case our evenness divinator. `Filter` filters out all elements in our list that the predicate function returns `false` for. Let's see it in action.
+
+TODO: insert step by step run through of filter.
+
+Here is how we can use filter:
+
+```js
+const evenlyHatchedSquares = filter(squares, (square) => isEven(square));
+```
+
+By using `filter` we've abstracted the pattern of looping through something, only keeping values that pass a certain criteria we have. Here is how one might implement `filter` by hand.
+
+```js
+const filter = (list, predicate) => {
+  const filtered = [];
+  list.forEach((thing) => {
+    if (predicate(thing)) {
+      filtered.push(thing);
+    }
+  });
+
+  return filtered;
+};
+```
+
+Instead of manually looping through our list each time we need to filter out some data, let's stick with the more concise `filter`.
+
+## FlatMap
+
+"Amazing!," your boss says. "But throwing away so many oddly hatched squares has proven wasteful. We need to streamline our process. For every evenly hatched triangle we put in, we need to output three evenly hatched squares!" This request perplexes us. Our triangle transmogrifier takes one triangle and transmogrifies it into one square. Where will the other two squares come from? After some divine inspiration, we create a square summoner. This square summoner takes one triangle as input, and summons a list of three squares as output.
+
+TODO: insert diagram showing `summonSquares(triangle) -> List<square>`
+
+Let's see it in action.
+
+TODO: insert diagram showing examples of `summonSquares`
+
+This square summoner is quite interesting. Unlike the triangle transmogrifier, which returns a single square, the square summoner returns a list of squares. Much more efficient! Here is one way we can use it:
+
+```js
+const efficientSquares = [];
+triangles.forEach((triangle) => {
+  const squares = summonSquares(triangle);
+  squares.forEach((square) => {
+    efficientSquares.push(square);
+  });
+});
+```
+
+Can we do this more concisely? Yes, using `flatMap`. Here is what it looks like:
+
+TODO: insert diagram showing `flatMap<T, U>(list: List<T>, mapper(t: T) => List<U>): List<U>`
+
+Like `map` and `filter`, `flatMap` also takes two arguments. The first is the
 
