@@ -123,7 +123,7 @@ Let's see it in action.
 
 TODO: insert diagram showing examples of `summonSquares`
 
-This square summoner is quite interesting. Unlike the triangle transmogrifier, which returns a single square, the square summoner returns a list of squares. Much more efficient! Here is one way we can use it:
+This square summoner is quite interesting. Unlike the triangle transmogrifier, which returns a single square, the square summoner returns a list of three squares. Much more efficient! Here is one way we can use it:
 
 ```js
 const efficientSquares = [];
@@ -135,9 +135,91 @@ triangles.forEach((triangle) => {
 });
 ```
 
-Can we do this more concisely? Yes, using `flatMap`. Here is what it looks like:
+Can we do this more concisely? Our first instinct might be to use `map`. `Map` applies a function to every element of a list, which is what we'll ultimately need to do in the case too. Let's see what happens:
+
+```js
+const efficientSquares = map(triangles, (triangle) => summonSquares(triangle));
+```
+
+TOOD: insert diagram showing nested list of squares
+
+Unfortunately this result is not quite right. We've correctly managed to generate our squares but they're nested inside a list of lists. Rather than accumulating our results in another list, we'd like to concatenate our results together. Luckily there is a function that does just that: `flatMap`. Here is what it looks like:
 
 TODO: insert diagram showing `flatMap<T, U>(list: List<T>, mapper(t: T) => List<U>): List<U>`
 
-Like `map` and `filter`, `flatMap` also takes two arguments. The first is the
+Like `map` and `filter`, `flatMap` also takes two arguments. The first is the list we're operating on. The second is a mapper function that will be applied to every element of our list. The results are concatted together, and the end result is the combined list of results. The mapper function of `flatMap` differs from the mapper function of `map` in that while `map`'s mapper function can return anything you want, `flatMap`'s mapper function must return another list.
 
+Here is `flatMap` in action:
+
+TOOD: insert diagram showing examples of flatMap
+
+We can use it like this:
+
+```js
+const efficientSquares = flatMap(triangles, (triangle) => summonSquares(triangle));
+```
+
+or more concisely:
+
+```js
+const efficientSquares = flatMap(triangles, summonSquares);
+```
+
+Here is how one might implement `flatMap` by  hand:
+
+```js
+const flatMap = (list, mapper) => {
+  const results = [];
+  list.forEach((item) => {
+    mapper(item).forEach((mappedItem) => {
+      results.push(mappedItem);
+    });
+  });
+
+  return results;
+};
+```
+
+One might wonder why they would ever need to use `flatMap`. The requirement for the `mapper` function is much more specific in `flatMap` than it is in `map`. The `mapper` of `flatMap` is constrained to only ever return a list of things, whereas the `mapper` of `map` is free to be whatever it wants. Somewhat counterintuitively, the constraint in `flatMap` makes it a bit more general than `map`. We've already seen one example -- where the number of elements that go in to `map` must always match the number of elements that come out of `map`, we were able to triple the number of elements coming out of `flatMap`. In fact, we can implement `map` using only `flatMap`.
+
+## Implementing Map Using FlatMap
+
+We want to implement the following:
+
+```js
+const map = (list, mapper) => {
+  // ???
+};
+```
+
+where `mapper` takes in a list item and can return anything. To implement `map` using `flatMap`, we need to make the `mapper` function of `map` compatible with the `mapper` function of `flatMap`. The simplest way to do this is to wrap the output of `map`'s `mapper` function in a list.
+
+```js
+const map = (list, mapper) => {
+  const flatMapCompatibleMapper = (item) => [mapper(item)];
+  return flatMap(list, flatMapCompatibleMapper);
+};
+```
+
+or more concisely:
+
+```js
+const map = (list, mapper) => {
+  return flatMap(list, (item) => [mapper(item)]);
+};
+```
+
+And everything works as expected. Let's take a closer look at what happened.
+
+TODO: insert diagram showing what happened
+
+This implementation of `map` passes each element of the list through the initial `mapper` function, swaddles it in a list, and then concatenates the resulting lists together into the final result. It's admittedly less straightforward than the looped implementation of `map`, but functionally the two approaches are identical.
+
+
+## We Ran Into A Slight Problem
+
+"That's a very creative solution," your boss says. "But we've actually gone backwards a little. Our company strives to produce only evenly hatched squares. Not only have we started making oddly hatched squares, we've done so at three times the previous rate!"
+
+## Implementing Filter Using FlatMap
+
+We've seen `flatMap` increase the number of elements
