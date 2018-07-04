@@ -17,6 +17,7 @@
     "webpack-serve": "^1.0.2"
   },
   "dependencies": {
+    "babel-preset-react": "^6.24.1",
     "d3": "^5.4.0",
     "gsap": "^2.0.1",
     "react": "^16.4.1",
