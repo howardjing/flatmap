@@ -27,16 +27,24 @@ const Pipe = ({
   bodyWidth,
   bodyHeight,
   rightHeight,
+  name,
 }: {
   leftHeight: number,
   bodyWidth: number,
   bodyHeight: number,
   rightHeight: number,
+  name?: string,
 }) => {
   const edgeWidth = 10;
   const leftHeightOffset = centerRelativeTo(leftHeight, rightHeight);
   const bodyHeightOffset = centerRelativeTo(bodyHeight, Math.max(leftHeight, rightHeight));
   const rightHeightOffset = centerRelativeTo(rightHeight, leftHeight);
+  const label = name ? (
+    <text
+      alignmentBaseline="baseline"
+      x={edgeWidth + 10} y={bodyHeightOffset - 2} fill="black" style={{fontSize: "20px"}}
+    >{name}</text>
+  ) : null;
 
   return (
     <Fragment>
@@ -50,6 +58,7 @@ const Pipe = ({
         strokeWidth="1"
         strokeLinecap="butt"
       />
+      {label}
       <rect
         x={edgeWidth}
         y={bodyHeightOffset}
@@ -105,8 +114,7 @@ const Stuff = ({ type }: Props) => {
       </g>
 
       <g transform="translate(100 1)">
-        {/* <!-- Simple rect element --> */}
-        <Pipe leftHeight={40} bodyWidth={100} bodyHeight={30} rightHeight={60} />
+        <Pipe name="double" leftHeight={40} bodyWidth={100} bodyHeight={30} rightHeight={60} />
       </g>
 
       <g transform={`translate(230 ${verticalOffset})`}>
@@ -119,13 +127,11 @@ const Stuff = ({ type }: Props) => {
       </g>
 
       <g transform="translate(130 80)">
-        {/* <!-- Simple rect element --> */}
-        <Pipe leftHeight={60} bodyWidth={100} bodyHeight={30} rightHeight={40} />
+        <Pipe leftHeight={60} bodyWidth={100} bodyHeight={30} rightHeight={40} name="foo" />
       </g>
 
       <g transform="translate(0 80)">
-        {/* <!-- Simple rect element --> */}
-        <Pipe leftHeight={60} bodyWidth={100} bodyHeight={50} rightHeight={60} />
+        <Pipe leftHeight={60} bodyWidth={100} bodyHeight={50} rightHeight={60} name="bar" />
       </g>
     </svg>
   )
