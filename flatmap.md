@@ -385,4 +385,8 @@ class SentimentalNumber {
 }
 ```
 
-By
+Our implementation of `flatMap` is pretty much the same as our implementation of `handleSentimental`. Because the method `f` is passed in after we already have a value, this `flatMap` returns another `SentimentalNumber` rather than a transformed function.
+
+Our implementation of `map` is different. Here we reuse `flatMap` to handle the history logic, and pass in a slightly altered `makeSentimental` function as the standard behavior we take when converting a `number` to a `SentimentalNumber`.
+
+Ulimately both styles result in the same `SentimentalNumber` generated
