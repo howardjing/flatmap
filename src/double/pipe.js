@@ -1,9 +1,5 @@
 // @flow
-import React, { Fragment } from 'react';
-
-type Props = {
-  type: "big" | "small",
-};
+import * as React from 'react';
 
 const centerRelativeTo = (self: number, relativeTo: number): number => Math.max((relativeTo - self) / 2, 0);
 const sum = (...lengths: number[]): number => lengths.reduce((partial, next) => partial + next, 0);
@@ -14,40 +10,182 @@ const ArrowHead = () => (
   </marker>
 );
 
+interface Shape {
+  +getWidth: () => number;
+  +getHeight: () => number;
+  +render: () => React.Node;
+}
+
+class ArrowShape {
+  height: number;
+  width: number;
+
+  constructor({
+    width,
+  }: {
+    width: number,
+  }) {
+    this.width = width;
+    this.height = 2;
+  }
+
+  getWidth() {
+    return this.width;
+  }
+
+  getHeight() {
+    return 0;
+  }
+
+  render() {
+    return (
+      <Arrow height={this.height} width={this.width} />
+    );
+  }
+}
+
+class ProxyShape {
+  +width: number;
+  +height: number;
+  +node: React.Node;
+
+  constructor({
+    width,
+    height,
+    node,
+  }: {
+    width: number,
+    height: number,
+    node: React.Node,
+  }) {
+    this.width = width;
+    this.height = height;
+    this.node = node;
+  }
+
+  getWidth() {
+    return this.width;
+  }
+
+  getHeight() {
+    return this.height;
+  }
+
+  render() {
+    return this.node;
+  }
+}
+
+class PipeShape {
+  edgeWidth: number;
+  leftHeight: number;
+  bodyWidth: number;
+  bodyHeight: number;
+  rightHeight: number;
+  name: string | void;
+
+  constructor({
+    leftHeight,
+    bodyWidth,
+    bodyHeight,
+    rightHeight,
+    name,
+  }: {
+    leftHeight: number,
+    bodyWidth: number,
+    bodyHeight: number,
+    rightHeight: number,
+    name?: string,
+  }) {
+    this.edgeWidth = 10;
+    this.leftHeight = leftHeight;
+    this.bodyWidth = bodyWidth;
+    this.bodyHeight = bodyHeight;
+    this.rightHeight = rightHeight;
+    this.name = name;
+  }
+
+  getWidth() {
+    return this.edgeWidth * 2 + this.bodyWidth;
+  }
+
+  getHeight() {
+    return Math.max(this.leftHeight, this.rightHeight, this.bodyHeight);
+  }
+
+  render() {
+    return (
+      <Pipe
+        edgeWidth={this.edgeWidth}
+        leftHeight={this.leftHeight}
+        bodyWidth={this.bodyWidth}
+        bodyHeight={this.bodyHeight}
+        rightHeight={this.rightHeight}
+        name={this.name}
+      />
+    );
+  }
+}
+
+const renderRow = (shapes: Shape[]): React.Node[] => {
+  const heights = shapes.map(s => s.getHeight());
+  const maxHeight = Math.max(...heights);
+  const marginWidth = 15;
+
+  return shapes.reduce(({ xOffset, renderedShapes }, s) => {
+    const yOffset = centerRelativeTo(s.getHeight(), maxHeight);
+    const rendered = (
+      <g key={xOffset} transform={`translate(${xOffset} ${yOffset})`}>
+        {s.render()}
+      </g>
+    )
+    return ({
+      xOffset: xOffset + s.getWidth() + marginWidth,
+      renderedShapes: renderedShapes.concat([rendered]),
+    })
+  }, {
+    xOffset: 0,
+    renderedShapes: [],
+  }).renderedShapes;
+};
+
 const Arrow = ({
+  height,
   width,
 }: {
+  height: number,
   width: number,
 }) => (
-  <line x1="0" y1="0" x2={width} y2="0" stroke="#000" strokeWidth="2" markerEnd="url(#arrow)" />
+  <line x1="0" y1="0" x2={width} y2="0" stroke="#000" strokeWidth={height} markerEnd="url(#arrow)" />
 );
 
 const Pipe = ({
+  edgeWidth,
   leftHeight,
   bodyWidth,
   bodyHeight,
   rightHeight,
   name,
 }: {
+  edgeWidth: number,
   leftHeight: number,
   bodyWidth: number,
   bodyHeight: number,
   rightHeight: number,
   name?: string,
 }) => {
-  const edgeWidth = 10;
   const leftHeightOffset = centerRelativeTo(leftHeight, rightHeight);
   const bodyHeightOffset = centerRelativeTo(bodyHeight, Math.max(leftHeight, rightHeight));
   const rightHeightOffset = centerRelativeTo(rightHeight, leftHeight);
   const label = name ? (
     <text
       alignmentBaseline="baseline"
-      x={edgeWidth + 10} y={bodyHeightOffset - 2} fill="black" style={{fontSize: "20px"}}
+      x={edgeWidth + 10} y={bodyHeightOffset - 2} fill="black" style={{fontSize: "16px"}}
     >{name}</text>
   ) : null;
 
   return (
-    <Fragment>
+    <React.Fragment>
       <rect
         x="0"
         y={leftHeightOffset}
@@ -79,19 +217,19 @@ const Pipe = ({
         strokeWidth="1"
         strokeLinecap="butt"
       />
-    </Fragment>
+    </React.Fragment>
   );
 };
 
-const Stuff = ({ type }: Props) => {
+const Stuff = () => {
   const pipe = {
     width: {
       body: 100,
       edge: 10,
     },
     height: {
-      body: type === "small" ? 30 : 50,
-      edge: type === "small" ? 40 : 60,
+      body: 50,
+      edge: 60,
     }
   };
 
@@ -100,38 +238,58 @@ const Stuff = ({ type }: Props) => {
   const mainPipeWidth = 100;
 
   const verticalOffset = (pipe.height.edge / 2) + 8;
+
+  const makeLabel = (label: string) => new ProxyShape({
+    width: 14,
+    height: 0,
+    node: (
+      <text fill="black" alignmentBaseline="middle" style={{fontSize: "24px"}}>
+        {label}
+      </text>
+    )
+  });
+
+  const arrow = new ArrowShape({ width: 15 });
+
+  const xs = renderRow([
+    makeLabel("4"),
+    arrow,
+    new PipeShape({
+      name: 'double',
+      leftHeight: 40,
+      bodyWidth: 80,
+      bodyHeight: 30,
+      rightHeight: 40,
+    }),
+    arrow,
+    makeLabel("8"),
+    arrow,
+    new PipeShape({
+      name: 'addOne',
+      leftHeight: 40,
+      bodyWidth: 80,
+      bodyHeight: 30,
+      rightHeight: 40,
+    }),
+    arrow,
+    makeLabel("9"),
+  ]);
+
   return (
-    <svg>
+    <svg style={{width: '100%'}}>
       <defs>
         <ArrowHead />
       </defs>
-      <g>
-        <text x="0" y={verticalOffset} fill="black" style={{fontSize: "20px"}}>4</text>
-      </g>
-
-      <g transform={`translate(30 ${verticalOffset})`}>
-        <Arrow width={50} />
-      </g>
-
-      <g transform="translate(100 1)">
-        <Pipe name="double" leftHeight={40} bodyWidth={100} bodyHeight={30} rightHeight={60} />
-      </g>
-
-      <g transform={`translate(230 ${verticalOffset})`}>
-        <Arrow width={50} />
-      </g>
-
-      <g>
-        <text x={60 + pipe.width.body + 50 + (2 * pipe.width.edge) + 60} y={verticalOffset}
-          fill="black" style={{fontSize: "20px"}}>8</text>
+      <g transform="translate(0 10)">
+        {xs}
       </g>
 
       <g transform="translate(130 80)">
-        <Pipe leftHeight={60} bodyWidth={100} bodyHeight={30} rightHeight={40} name="foo" />
+        <Pipe leftHeight={60} edgeWidth={10} bodyWidth={100} bodyHeight={30} rightHeight={40} name="foo" />
       </g>
 
       <g transform="translate(0 80)">
-        <Pipe leftHeight={60} bodyWidth={100} bodyHeight={50} rightHeight={60} name="bar" />
+        <Pipe leftHeight={60} edgeWidth={10} bodyWidth={100} bodyHeight={50} rightHeight={60} name="bar" />
       </g>
     </svg>
   )
