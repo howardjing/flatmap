@@ -75,12 +75,12 @@ const Pipe = ({
   const label = name ? (
     <text
       alignmentBaseline="baseline"
-      x={edgeWidth + 10} y={bodyHeightOffset - 2} fill="black" style={{fontSize: "16px"}}
+      x={edgeWidth + 10} y={bodyHeightOffset - 6} fill="black" style={{fontSize: "16px"}}
     >{name}</text>
   ) : null;
 
   return (
-    <React.Fragment>
+    <g transform="translate(0 3)">
       <rect
         x="0"
         y={leftHeightOffset}
@@ -112,7 +112,7 @@ const Pipe = ({
         strokeWidth="1"
         strokeLinecap="butt"
       />
-    </React.Fragment>
+    </g>
   );
 };
 
