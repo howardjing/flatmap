@@ -1,10 +1,33 @@
 // @flow
 import React from 'react';
-import Pipe from './pipe';
+import makeTextLabel from '../_common/make-text-label';
+import { DEFAULT_ARROW } from '../_common/shape-arrow';
+import PipeShape, { normalPipeDimensions } from '../_common/shape-pipe';
+import renderRow from '../_common/render-row';
+import SvgContainer from '../_common/svg-container';
 
-const Double = () =>
-  <div>
-    <Pipe type="small" />
-  </div>
+const LABEL_FONT_SIZE = '24px';
+
+const shapes = [
+  makeTextLabel("4", {
+    width: 14,
+    fontSize: LABEL_FONT_SIZE,
+  }),
+  DEFAULT_ARROW,
+  new PipeShape(Object.assign({}, {
+    name: 'double',
+  }, normalPipeDimensions)),
+  DEFAULT_ARROW,
+  makeTextLabel("8", {
+    width: 14,
+    fontSize: LABEL_FONT_SIZE,
+  }),
+];
+
+const Double = () => (
+  <SvgContainer height="55px">
+    {renderRow(shapes)}
+  </SvgContainer>
+);
 
 export default Double;
