@@ -120,8 +120,18 @@ function ceiling(x: number): number {
     </p>
     <div id="compose-altered"></div>
     <p>
-      On the minus side, it is quite tedious and error prone. In fact, the previous example's <em>ceiling</em> method has been incorrectly altered.
+      On the minus side, this approach is quite tedious and error prone. In fact, the previous example's <em>ceiling</em> method has been incorrectly modified.
       Rather than logging, "ceiling called", it logs, "addOne called." This type of bug can be quite tricky to track down.
     </p>
+    <p>
+      What would a good solution look like? Ideally we would like to keep the positive aspect of this approach --
+      we'd like to be able to use our new functions like we did our old functions. However, rather than manually modifying each function,
+      we would like to automate the process. One approach would be to take a page from Aspect Oriented Programming and create a decorator function.
+      Let's call it <em>traceCall</em>. <em>traceCall</em> will take a function in the shape of <em>double</em>, <em>addOne</em>, or <em>ceiling</em> as
+      input. It will output an automatically modified <em>double'</em>, <em>addOne'</em>, or <em>ceiling'</em> function. Calling this outputted function
+      will log the base function's name before calling it.
+    </p>
+    <div id="double-decorated"></div>
+    <p>Here we see that we've generated a new function <em>double'</em> based on our existing <em>double</em> function. Usage is the same as before.</p>
   </body>
 </html>

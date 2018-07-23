@@ -3,7 +3,7 @@ import React from 'react';
 import makeTextLabel from '../_common/make-text-label';
 import SideEffect from '../_common/side-effect';
 import { DEFAULT_ARROW } from '../_common/shape-arrow';
-import PipeShape, { normalPipeDimensions } from '../_common/shape-pipe';
+import PipeShape, { normalPipe } from '../_common/shape-pipe';
 import renderRow from '../_common/render-row';
 import SvgContainer from '../_common/svg-container';
 
@@ -17,7 +17,7 @@ const shapes = [
   DEFAULT_ARROW,
   new PipeShape(Object.assign({}, {
     name: 'ceiling',
-  }, normalPipeDimensions)),
+  }, normalPipe)),
   DEFAULT_ARROW,
   makeTextLabel("11", {
     width: 24,

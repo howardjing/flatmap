@@ -3,7 +3,7 @@ import makeTextLabel from './make-text-label';
 import { Shape } from './shape';
 import { WIDE_ARROW } from './shape-arrow';
 import { DEFAULT_MARGIN } from './render-row';
-import { sum } from './utils';
+import { sum, centerRelativeTo } from './utils';
 
 const SideEffect = ({ shapes, label, labelWidth }: {
   shapes: Shape[],
@@ -17,7 +17,9 @@ const SideEffect = ({ shapes, label, labelWidth }: {
   const totalWidth = sum(...prevShapesWidth) + (prevShapes.length * DEFAULT_MARGIN);
   const currentShape = shapes[currentIndex];
   const xOffset = (currentShape.getWidth() / 2) + totalWidth;
-  const yOffset = currentShape.getHeight() - 1;
+
+  const maxHeight = Math.max(...prevShapes.map(s => s.getHeight()));
+  const yOffset = centerRelativeTo(currentShape.getHeight(), maxHeight) + currentShape.getHeight() - 1;
   const textLabel = makeTextLabel(label, {
     width: labelWidth,
     fontSize: '12px',

@@ -9,6 +9,7 @@ class PipeShape implements Shape {
   bodyWidth: number;
   bodyHeight: number;
   rightHeight: number;
+  color: string;
   name: string | void;
 
   constructor({
@@ -16,12 +17,14 @@ class PipeShape implements Shape {
     bodyWidth,
     bodyHeight,
     rightHeight,
+    color,
     name,
   }: {
     leftHeight: number,
     bodyWidth: number,
     bodyHeight: number,
     rightHeight: number,
+    color: string,
     name?: string,
   }) {
     this.edgeWidth = 10;
@@ -29,6 +32,7 @@ class PipeShape implements Shape {
     this.bodyWidth = bodyWidth;
     this.bodyHeight = bodyHeight;
     this.rightHeight = rightHeight;
+    this.color = color;
     this.name = name;
   }
 
@@ -48,6 +52,7 @@ class PipeShape implements Shape {
         bodyWidth={this.bodyWidth}
         bodyHeight={this.bodyHeight}
         rightHeight={this.rightHeight}
+        color={this.color}
         name={this.name}
       />
     );
@@ -60,6 +65,7 @@ const Pipe = ({
   bodyWidth,
   bodyHeight,
   rightHeight,
+  color,
   name,
 }: {
   edgeWidth: number,
@@ -67,6 +73,7 @@ const Pipe = ({
   bodyWidth: number,
   bodyHeight: number,
   rightHeight: number,
+  color: string,
   name?: string,
 }) => {
   const leftHeightOffset = centerRelativeTo(leftHeight, rightHeight);
@@ -86,7 +93,7 @@ const Pipe = ({
         y={leftHeightOffset}
         width={edgeWidth}
         height={leftHeight}
-        fill="pink"
+        fill={color}
         stroke="black"
         strokeWidth="1"
         strokeLinecap="butt"
@@ -97,7 +104,7 @@ const Pipe = ({
         y={bodyHeightOffset}
         width={bodyWidth}
         height={bodyHeight}
-        fill="pink"
+        fill={color}
         stroke="black"
         strokeWidth="1"
         strokeLinecap="butt"
@@ -107,7 +114,7 @@ const Pipe = ({
         y={rightHeightOffset}
         width={edgeWidth}
         height={rightHeight}
-        fill="pink"
+        fill={color}
         stroke="black"
         strokeWidth="1"
         strokeLinecap="butt"
@@ -116,15 +123,24 @@ const Pipe = ({
   );
 };
 
-const normalPipeDimensions = {
+const normalPipe = {
   leftHeight: 40,
   bodyWidth: 80,
   bodyHeight: 30,
   rightHeight: 40,
+  color: 'pink',
 }
 
+const higherOrderPipe = {
+  leftHeight: 60,
+  bodyWidth: 120,
+  bodyHeight: 50,
+  rightHeight: 60,
+  color: 'purple',
+}
 
 export default PipeShape;
 export {
-  normalPipeDimensions,
+  normalPipe,
+  higherOrderPipe,
 }

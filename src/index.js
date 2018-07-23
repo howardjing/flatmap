@@ -10,6 +10,7 @@ import DoubleAltered from './double-altered';
 import AddOneAltered from './add-one-altered';
 import CeilingIncorrectlyAltered from './ceiling-incorrectly-altered';
 import ComposeAltered from './compose-altered';
+import DoubleDecorated from './double-decorated';
 
 ReactDOM.render(<Double />, document.querySelector('#double'));
 ReactDOM.render(<AddOne />, document.querySelector('#add-one'));
@@ -21,3 +22,4 @@ ReactDOM.render(<DoubleAltered />, document.querySelector('#double-altered'));
 ReactDOM.render(<AddOneAltered />, document.querySelector('#add-one-altered'));
 ReactDOM.render(<CeilingIncorrectlyAltered />, document.querySelector('#ceiling-incorrectly-altered'));
 ReactDOM.render(<ComposeAltered />, document.querySelector('#compose-altered'));
+ReactDOM.render(<DoubleDecorated />, document.querySelector('#double-decorated'));
