@@ -3,10 +3,12 @@ import * as React from 'react';
 import { Shape } from './shape';
 import { centerRelativeTo } from './utils';
 
+const DEFAULT_MARGIN = 15;
+
 const renderRow = (shapes: Shape[]): React.Node[] => {
   const heights = shapes.map(s => s.getHeight());
   const maxHeight = Math.max(...heights);
-  const marginWidth = 15;
+  const marginWidth = DEFAULT_MARGIN;
 
   return shapes.reduce(({ xOffset, renderedShapes }, s) => {
     const yOffset = centerRelativeTo(s.getHeight(), maxHeight);
@@ -26,3 +28,6 @@ const renderRow = (shapes: Shape[]): React.Node[] => {
 };
 
 export default renderRow;
+export {
+  DEFAULT_MARGIN,
+}

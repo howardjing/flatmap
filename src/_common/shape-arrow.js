@@ -47,9 +47,11 @@ const ArrowHead = () => (
 );
 
 const DEFAULT_ARROW = new ArrowShape({ width: 15 });
+const WIDE_ARROW = new ArrowShape({ width: 30 });
 
 export default ArrowShape;
 export {
   ArrowHead,
   DEFAULT_ARROW,
+  WIDE_ARROW,
 }

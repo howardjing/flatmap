@@ -4,6 +4,12 @@
   <head>
     <meta charset="UTF-8">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <style>
+      body {
+        margin: 0 auto;
+        width: 1000px;
+      }
+    </style>
   </head>
   <body>
     <h2>The Problem</h2>
@@ -68,28 +74,54 @@ ceiling(double(addOne(double(5.2)))) // => 23
 
     <p>What if we wanted to augment our functions to do more work on top of their existing behavior? For example, what if we wanted to log out the name of the function our number passes through as it journeys through our pipeline of functions? There are many ways to do this. One way is to directly modify our functions to log out their name before returning their value.</p>
 
-    <pre>
-function double(x: number): number {
-  console.log("double was called")
-  return x * 2;
-}
-
-/**
+    <div id="double-altered">
         double
 5.2 -> ===-==== 10.4
           |
           V
      double was called
-**/
+    </div>
+    <pre>
+function double(x: number): number {
+  console.log("double was called")
+  return x * 2;
+}
+    </pre>
+
+    <div id="add-one-altered">
+        addOne
+5.2 -> ===-==== 6.2
+          |
+          V
+     addOne was called
+    </div>
+    <pre>
 function addOne(x: number): number {
   console.log("addOne was called")
   return x + 1;
 }
-
+    </pre>
+    <div id="ceiling-incorrectly-altered">
+        ceiling
+5.2 -> ===-===== 6
+          |
+          V
+     addOne was called
+    </div>
+    <pre>
 function ceiling(x: number): number {
-  console.log("ceiling was called")
+  console.log("addOne was called")
   return Math.ceil(x);
 }
     </pre>
+    <p>
+      This approach has its plusses and minuses. On the plus side, we can use our new functions as we did our old functions. They have the same inputs and outputs --
+      the only difference is that our altered functions now log their name when called.
+    </p>
+    <div id="compose-altered"></div>
+    <p>
+      On the minus side, it is quite tedious and error prone. In fact, the previous example's <em>ceiling</em> method has been incorrectly altered.
+      Rather than logging, "ceiling called", it logs, "addOne called." This type of bug can be quite tricky to track down.
+    </p>
   </body>
 </html>
