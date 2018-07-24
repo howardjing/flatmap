@@ -12,9 +12,19 @@
     </style>
   </head>
   <body>
-    <h2>The Problem</h2>
+    <h2>Explaining monads via a series of tubes</h2>
+    <p>
+      Let's examine some of the motivation behind monads. We will explore ways of altering a function to log its name when called. We will first visualize
+      our function as a pipe that takes in an input and returns an output. We will then manually add our extra behavior using a side effect. We will then
+      modify it using a decorator function. We will explore further implementations without using side effects. We will first use <em>map</em> and define a functor.
+      We will then use <em>flatMap</em> and define a monad. Finally we will relate our findings back to JavaScript.
+    </p>
 
-    <p>Let's say we have a bunch of functions. For simplicity, let's assume our functions take in a number as input and return a number as output. This assumption allows us to combine our functions together in any order we want.</p>
+    <h3>Initial functions</h3>
+    <p>
+      Let's take a look at our initial functions. For simplicity, let's assume our functions take in a number as input and return a number as output.
+      This assumption allows us to combine our functions together in any order we want.
+    </p>
     <div id="double">
       double
 5 -> ======== -> 10
@@ -24,6 +34,7 @@ function double(x: number): number {
   return x * 2;
 }
     </pre>
+    <p><em>double</em> doubles its input.</p>
 
     <div id="add-one">
      addOne
@@ -34,6 +45,7 @@ function addOne(x: number): number {
   return x + 1;
 }
     </pre>
+    <p><em>addOne</em> adds one to its input.</p>
 
     <div id="ceiling">
          ceiling
@@ -44,8 +56,9 @@ function ceiling(x: number): number {
   return Math.ceil(x);
 }
     </pre>
+    <p><em>ceiling</em> rounds its input to the next highest integer.</p>
 
-
+    <h3>Using our functions</h3>
     <p>Here are a few ways we can compose the functions <em>double</em>, <em>addOne</em>, and <em>ceiling</em>.
 
     <div id="compose-normal-1">
@@ -71,8 +84,18 @@ ceiling(double(addOne(5.2))) // => 13
     <pre>
 ceiling(double(addOne(double(5.2)))) // => 23
     </pre>
+    <p>Because the inputs and outputs are compatible with each other, we can combine our functions however we'd like.</p>
 
-    <p>What if we wanted to augment our functions to do more work on top of their existing behavior? For example, what if we wanted to log out the name of the function our number passes through as it journeys through our pipeline of functions? There are many ways to do this. One way is to directly modify our functions to log out their name before returning their value.</p>
+    <h3>Log function calls</h3>
+    <p>
+      What if we wanted to augment the behavior of our functions? For example, let's modify our functions to log its name whenever
+      it gets called. This will allow us to track our functions as we use them.
+    </p>
+
+    <h3>A manual approach</h3>
+    <p>
+      Our initial approach might be to manually modify our functions.
+    </p>
 
     <div id="double-altered">
         double
@@ -115,23 +138,66 @@ function ceiling(x: number): number {
 }
     </pre>
     <p>
-      This approach has its plusses and minuses. On the plus side, we can use our new functions as we did our old functions. They have the same inputs and outputs --
-      the only difference is that our altered functions now log their name when called.
+      Here we've manually added a <em>console.log</em> statement to each one of our functions. Simply adding <em>console.log</em> does not affect the
+      return value of our functions. Because the inputs and outputs are not affected, we can compose our new functions as we did our
+      old ones.
     </p>
     <div id="compose-altered"></div>
     <p>
-      On the minus side, this approach is quite tedious and error prone. In fact, the previous example's <em>ceiling</em> method has been incorrectly modified.
-      Rather than logging, "ceiling called", it logs, "addOne called." This type of bug can be quite tricky to track down.
+      However, manually modifying each function is quite tedious and error prone. In fact, our new <em>ceiling</em> has a bug.
+      Rather than logging "ceiling called", it logs "addOne called." This class of copy paste bugs can be quite easy to miss.
+    </p>
+    <h3>Using a decorator</h3>
+    <p>
+      Let's now automatically modify our functions. We can take a page from Aspect Oriented Programming and create a decorator function
+      to do the work for us. Let's call it <em>logName</em>. Our new <em>logName</em> decorator will take a function in the shape of <em>double</em>, <em>addOne</em>,
+      or <em>ceiling</em> as input. It will output a new function i.e. <em>double'</em>, <em>addOne'</em>, or <em>ceiling'</em>, with the desired behavior.
     </p>
     <p>
-      What would a good solution look like? Ideally we would like to keep the positive aspect of this approach --
-      we'd like to be able to use our new functions like we did our old functions. However, rather than manually modifying each function,
-      we would like to automate the process. One approach would be to take a page from Aspect Oriented Programming and create a decorator function.
-      Let's call it <em>traceCall</em>. <em>traceCall</em> will take a function in the shape of <em>double</em>, <em>addOne</em>, or <em>ceiling</em> as
-      input. It will output an automatically modified <em>double'</em>, <em>addOne'</em>, or <em>ceiling'</em> function. Calling this outputted function
-      will log the base function's name before calling it.
+      As an aside, <em>double'</em>, <em>addOne'</em>, and <em>ceiling'</em> are not valid JavaScript names. Single quotes are not allowed within function names.
+      Let's ignore this -- we use the single quote to denote that our original function has been altered.
     </p>
     <div id="double-decorated"></div>
-    <p>Here we see that we've generated a new function <em>double'</em> based on our existing <em>double</em> function. Usage is the same as before.</p>
+    <pre>
+function logName(fn: (number) => number) {
+  return function(x: number) {
+    <%= "console.log(`${f.name} was called`);" %>
+    return f(x);
+  }
+}
+
+const double' = logName(double)
+double'(3) // => 6
+
+// or equivalently
+
+logName(double)(3) // => 6
+    </pre>
+    <p>Here we see that we've generated a new function <em>double'</em> based on our existing <em>double</em> function. A <em>double</em> function goes
+    in to the decorator, and a new function <em>double'</em> comes out of the decorator. We use the new <em>double'</em> as we use the original <em>double</em>.</p>
+    <p>Let's repeat the process with <em>addOne</em>, and <em>ceiling</em>.
+
+    <div id="add-one-decorated"></div>
+    <pre>
+const addOne' = logName(addOne)
+addOne'(11) // => 12
+    </pre>
+    <div id="ceiling-decorated"></div>
+    <pre>
+const ceiling' = logName(ceiling)
+ceiling'(11.1) // => 12
+    </pre>
+    <p>We can compose our new functions as we did our old functions.</p>
+
+    <pre>
+ceiling'(double'(addOne'(5.2))) // => 13
+    </pre>
+    <div id="compose-decorated"></div>
+    <p>
+      Moreover, because this modification process was automatic, we've fixed the original copy paste bug. Our modified <em>ceiling'</em> function correctly
+      logs the original <em>ceiling</em>'s name.
+    </p>
+    <h3>Without side effects</h3>
+    <p>Our previous implementations use <em>console.log</em>, a side effect.</p>
   </body>
 </html>

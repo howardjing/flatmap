@@ -15,7 +15,7 @@ const shapes = [
   }, normalPipe)),
   DEFAULT_ARROW,
   new PipeShape(Object.assign({}, {
-    name: 'traceCall',
+    name: 'logName',
   }, higherOrderPipe)),
   DEFAULT_ARROW,
   new PipeShape(Object.assign({}, {
