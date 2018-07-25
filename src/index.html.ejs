@@ -14,16 +14,16 @@
   <body>
     <h2>Explaining monads via a series of tubes</h2>
     <p>
-      Let's examine some of the motivation behind monads. We will explore ways of altering a function to log its name when called. We will first visualize
-      our function as a pipe that takes in an input and returns an output. We will then manually add our extra behavior using a side effect. We will then
-      modify it using a decorator function. We will explore further implementations without using side effects. We will first use <em>map</em> and define a functor.
-      We will then use <em>flatMap</em> and define a monad. Finally we will relate our findings back to JavaScript.
+      Let's provide some motivation for working with monads, i.e. flatMappable structures. We will explore ways of altering a function to log its name when called.
+      We will first visualize our function as a pipe that takes in an input and returns an output. We will then manually add our extra behavior using a side effect.
+      We will then use a decorator function to perform the same modification. We will explore further implementations without using side effects. We will first use
+      <em>map</em> and define a functor. We will then use <em>flatMap</em> and define a monad. Finally we will relate our findings back to JavaScript.
     </p>
 
     <h3>Initial functions</h3>
     <p>
-      Let's take a look at our initial functions. For simplicity, let's assume our functions take in a number as input and return a number as output.
-      This assumption allows us to combine our functions together in any order we want.
+      Let's examine a few initial functions. These are the functions we will modify. For simplicity, all our functions take in a number as input
+      and return a number as output. This allows us to combine our functions together in any order we want.
     </p>
     <div id="double">
       double
@@ -84,17 +84,17 @@ ceiling(double(addOne(5.2))) // => 13
     <pre>
 ceiling(double(addOne(double(5.2)))) // => 23
     </pre>
-    <p>Because the inputs and outputs are compatible with each other, we can combine our functions however we'd like.</p>
+    <p>Because all inputs and outputs are compatible with each other, we can combine our functions in any order.</p>
 
     <h3>Log function calls</h3>
     <p>
-      What if we wanted to augment the behavior of our functions? For example, let's modify our functions to log its name whenever
-      it gets called. This will allow us to track our functions as we use them.
+      What if we wanted to augment the behavior of our functions? For example, let's track when a function is called. Let's modify
+      our functions to log their name before returning their value. This can give us some insight as to how our functions are being used.
     </p>
 
     <h3>A manual approach</h3>
     <p>
-      Our initial approach might be to manually modify our functions.
+      One approach is to manually modify our functions.
     </p>
 
     <div id="double-altered">
@@ -138,20 +138,21 @@ function ceiling(x: number): number {
 }
     </pre>
     <p>
-      Here we've manually added a <em>console.log</em> statement to each one of our functions. Simply adding <em>console.log</em> does not affect the
-      return value of our functions. Because the inputs and outputs are not affected, we can compose our new functions as we did our
+      Here we've manually added a <em>console.log</em> statement to each one of our original functions. Simply adding <em>console.log</em> does not
+      affect the return value of our functions. Because inputs and outputs are not affected, we can compose our new functions as we did our
       old ones.
     </p>
     <div id="compose-altered"></div>
     <p>
       However, manually modifying each function is quite tedious and error prone. In fact, our new <em>ceiling</em> has a bug.
-      Rather than logging "ceiling called", it logs "addOne called." This class of copy paste bugs can be quite easy to miss.
+      Rather than logging "ceiling called", it logs "addOne called." This type of copy paste bug can be quite easy to miss.
     </p>
     <h3>Using a decorator</h3>
     <p>
-      Let's now automatically modify our functions. We can take a page from Aspect Oriented Programming and create a decorator function
+      Let's now automatically modify our functions. Taking a page from Aspect Oriented Programming, we can create a decorator function
       to do the work for us. Let's call it <em>logName</em>. Our new <em>logName</em> decorator will take a function in the shape of <em>double</em>, <em>addOne</em>,
-      or <em>ceiling</em> as input. It will output a new function i.e. <em>double'</em>, <em>addOne'</em>, or <em>ceiling'</em>, with the desired behavior.
+      or <em>ceiling</em> as input. It will return a new function i.e. <em>double'</em>, <em>addOne'</em>, or <em>ceiling'</em>, that logs the inputted function's
+      name before returning its value.
     </p>
     <p>
       As an aside, <em>double'</em>, <em>addOne'</em>, and <em>ceiling'</em> are not valid JavaScript names. Single quotes are not allowed within function names.
@@ -173,9 +174,14 @@ double'(3) // => 6
 
 logName(double)(3) // => 6
     </pre>
-    <p>Here we see that we've generated a new function <em>double'</em> based on our existing <em>double</em> function. A <em>double</em> function goes
-    in to the decorator, and a new function <em>double'</em> comes out of the decorator. We use the new <em>double'</em> as we use the original <em>double</em>.</p>
-    <p>Let's repeat the process with <em>addOne</em>, and <em>ceiling</em>.
+    <p>
+      Here we see that we've generated a new function <em>double'</em> based on our existing <em>double</em> function. A <em>double</em> function goes
+      in to the decorator, and a new function <em>double'</em> comes out of the decorator. The new <em>double'</em> differs from the original <em>double</em>
+      because it logs "double called" while the original <em>double</em> does not. Both functions ultimately double whatever is given to them. Because both
+      function take in numbers as input, and return the doubled number as output, we can use the new <em>double'</em> exactly as we use the original
+      <em>double</em>.
+    </p>
+    <p>Let's generate modified functions for <em>addOne</em>, and <em>ceiling</em> as well.
 
     <div id="add-one-decorated"></div>
     <pre>
@@ -195,9 +201,92 @@ ceiling'(double'(addOne'(5.2))) // => 13
     <div id="compose-decorated"></div>
     <p>
       Moreover, because this modification process was automatic, we've fixed the original copy paste bug. Our modified <em>ceiling'</em> function correctly
-      logs the original <em>ceiling</em>'s name.
+      logs the original <em>ceiling</em>'s name instead of logging out <em>addOne</em>'s name.
     </p>
     <h3>Without side effects</h3>
-    <p>Our previous implementations use <em>console.log</em>, a side effect.</p>
+    <p>
+      Introducing a side effect, i.e. interacting with the outside world, is a quick and easy way to tack on additional behavior to a function. Our previous implementations
+      use <em>console.log</em>, a side effect, to tell the world that a function was called. One limitation of this approach is once we log our function call,
+      we can no longer directly interact with that data. For example, how can we find the most commonly used function? We would have to dig into our logs
+      to tally up counts of function calls.
+    </p>
+    <p>
+      Instead of using a side effect, we can incorporate relevant information into the return value. For example, rather than returning a number directly, we
+      can instead return the number and function call history side by side. This approach is fairly heavy handed as our functions only know how to consume
+      numbers. They have no idea how to handle any extra information.
+    </p>
+    <pre>
+5 -> ====== -> { value: 5, traces: ["double called"] } -!-> ===== addOne ====
+    </pre>
+    <p>Nevertheless, let's try to solve the same problem with the additional constraint of no side effects. What would a solution look like?</p>
+    <p>
+      Let's start with our enhanced return value. Let's call it <em>Trace</em>. <em>Trace</em> will have two properties -- <em>value</em>, a number, and
+      <em>history</em>, a list of strings. These strings will represent all function names that have been called up to the current point.
+    </p>
+    <pre>
+type Trace = {
+  value: number,
+  history: string[],
+};
+    </pre>
+    <p>Here is an example of a trace:</p>
+    <pre>
+{
+  value: 30,
+  history: [
+    "double called",
+    "ceiling called",
+    "addOne called",
+  ],
+}
+    </pre>
+    <p>
+      This tells us that the current value is 30. Moreover it tells us that this number first passed through our <em>double</em> function. Afterwards,
+      it passed through <em>ceiling</em>, and finally <em>addOne</em>. Based on this, here is one possible way to generate this trace:
+    </p>
+    <pre>
+14.1 -> double -> 28.2 -> ceiling -> 29 -> addOne -> 30
+    </pre>
+    <p>
+      The above diagram only shows how our number passes through our pipeline of functions. Let's now show how the trace itself develops.
+    </p>
+    <pre>
+         {                     {                                  {
+14.1 -> value: 14.1, -> double ->   value: 28.2,       -> ceiling ->   value: 29,          -> addOne -> { value: 30,
+      history: []                  history: [                          history: [                          history: ["double called', "ceiling called", "addOne called"] }
+    }                               "double called",                   "double called",
+                                  ]                                    "ceiling called",
+                                }                                    ]
+                                                                   }
+    </pre>
+    <p>
+      From the above diagram, we see that we've modified our functions to accept <em>Trace</em> objects as inputs and return
+      <em>Trace</em> objects as outputs. Moreover, we kick things off by wrapping our original number in an initial <em>Trace</em> object.
+      This inaugural wrapping allows us to use our <em>Trace</em> enhanced functions.
+    </p>
+    <p>
+      Here is a utility function that generates our initial <em>Trace</em> object:
+    </p>
+    <pre>
+function buildTrace(value: number): Trace {
+  return {
+    value: value,
+    history: [],
+  };
+}
+    </pre>
+    <p>
+      We insert our given number into the <em>Trace</em> object we generate. Because no relevant functions have been called yet, we initialize
+      <em>history</em> to an empty array. This fresh <em>Trace</em> object will interact with our functions.
+    </p>
+    <p>Now we must figure out how to modify our functions to accept and return traces.</p>
+    <h3>A manual trace</h3>
+    <p>Let's start with the manual approach.</p>
+
+<pre>
+function double(trace: Trace): Trace {
+  const { value, history } = trace;
+}
+</pre>
   </body>
 </html>
