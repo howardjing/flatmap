@@ -272,7 +272,7 @@ ceiling'(double'(addOne'(5.2))) // => 13
     </p>
     <p>For example, here we modify <em>double</em> to return extra information, but do not modify <em>addOne</em> to accept extra information:</p>
     <pre>
-5 -> =double===== -> { value: 5, traces: ["double called"] } -!-> ===== addOne ====
+5 -> =double===== -> { value: 5, history: ["double called"] } -!-> ===== addOne ====
     </pre>
     <p>
       As we can see, <em>addOne</em> does not know what to do with <em>double</em>'s output, and so the program crashes. This shows us that modifying return values
@@ -280,17 +280,24 @@ ceiling'(double'(addOne'(5.2))) // => 13
       we now can only use one or the other. Nevertheless, let's continue down this path.
     </p>
     <p>
-      Let's start by defining our enhanced return value. Let's call it <em>Trace</em>. <em>Trace</em> will have two properties -- <em>value</em>, a number, and
+      Let's start by defining our enhanced return value. Let's call it <em>Log</em>. <em>Log</em> will have two properties -- <em>value</em>, a number, and
       <em>history</em>, a list of strings. These strings will represent all function names that have been called up to the current point.
     </p>
-    <pre>
-type Trace = {
+    <div class="row--code">
+      <div class="border-right">
+        <p>
+          Here is the definition of our <em>Log</em> type:
+        </p>
+        <pre>
+type Log = {
   value: number,
   history: string[],
 };
-    </pre>
-    <p>Here is an instance of a <em>Trace</em> object:</p>
-    <pre>
+        </pre>
+      </div>
+      <div>
+        <p>Here is an instance of a <em>Log</em> object:</p>
+        <pre>
 {
   value: 30,
   history: [
@@ -299,16 +306,18 @@ type Trace = {
     "addOne called",
   ],
 }
-    </pre>
+        </pre>
+      </div>
+    </div>
     <p>
-      This tells us that the current value is 30. Moreover it tells us that this number first passed through our <em>double</em> function. Afterwards,
-      it passed through <em>ceiling</em>, and finally <em>addOne</em>. Based on that, here is one possible way to generate this trace:
+      The above sample <em>Log</em> object has a current value of 30. Moreover our log tells us that it first passed through our <em>double</em> function. Afterwards,
+      it passed through <em>ceiling</em>, and finally <em>addOne</em>. Based on that, here is one possible way to generate this log:
     </p>
     <pre>
 14.1 -> double -> 28.2 -> ceiling -> 29 -> addOne -> 30
     </pre>
     <p>
-      The above diagram only shows how our number passes through our pipeline of functions. Let's now show how the trace itself develops.
+      The above diagram only shows how our number passes through our pipeline of functions. Let's now show how the log itself develops.
     </p>
     <pre>
           {                     {                                  {
@@ -320,15 +329,15 @@ type Trace = {
                                                                     }
     </pre>
     <p>
-      From the above diagram, we see that we've modified our functions to accept <em>Trace</em> objects as inputs and return
-      <em>Trace</em> objects as outputs. Moreover, we kick things off by wrapping our original number in an initial <em>Trace</em> object.
-      This inaugural wrapping allows us to start using our <em>Trace</em> enhanced functions.
+      From the above diagram, we see that we've modified our functions to accept <em>Log</em> objects as inputs and return
+      <em>Log</em> objects as outputs. Moreover, we kick things off by wrapping our original number in an initial <em>Log</em> object.
+      This inaugural wrapping allows us to start using our <em>Log</em> enhanced functions.
     </p>
     <p>
-      Here is a utility function that generates our initial <em>Trace</em> object:
+      Here is a utility function that generates our initial <em>Log</em> object:
     </p>
     <pre>
-function buildTrace(value: number): Trace {
+function buildLog(value: number): Log {
   return {
     value: value,
     history: [],
@@ -336,16 +345,16 @@ function buildTrace(value: number): Trace {
 }
     </pre>
     <p>
-      We insert our given number into the <em>Trace</em> object we generate. Because no relevant functions have been called yet, we initialize
-      <em>history</em> to an empty array. This fresh <em>Trace</em> object will be the starting point to interact with our other functions.
+      We insert our given number into the <em>Log</em> object we generate. Because no relevant functions have been called yet, we initialize
+      <em>history</em> to an empty array. This fresh <em>Log</em> object will be the starting point to interact with our other functions.
     </p>
-    <p>Now we must figure out how to modify our functions to accept and return traces.</p>
+    <p>Now we must figure out how to modify our functions to accept and return logs.</p>
     <h3>A manual approach</h3>
     <p>Let's start with the manual approach.</p>
 
     <pre>
-function double(trace: Trace): Trace {
-  const { value, history } = trace;
+function double(log: Log): Log {
+  const { value, history } = log;
   const doubled = value * 2;
   const newHistory = history.concat(["double called"]);
   return {
@@ -357,7 +366,7 @@ function double(trace: Trace): Trace {
 double({ value: 3, history: ["cheese"] }) // => { value: 6, history: ["cheese", "double called"] }
     </pre>
     <p>
-      Here we see our enhanced <em>double</em> function. Rather than dealing with <em>number</em> inputs and outputs, it deals with <em>Trace</em> inputs
+      Here we see our enhanced <em>double</em> function. Rather than dealing with <em>number</em> inputs and outputs, it deals with <em>Log</em> inputs
       and outputs. As a result, it can no longer interact with <em>addOne</em> and <em>ceiling</em>.
     </p>
     <pre>
@@ -365,13 +374,13 @@ double({ value: 3, history: ["cheese"] }) // => { value: 6, history: ["cheese", 
     </pre>
     <p>
       Let's modify <em>addOne</em>, and
-      <em>ceiling</em> to handle <em>Trace</em>s as well.
+      <em>ceiling</em> to handle <em>Log</em>s as well.
     </p>
     <div class="row--code">
       <div class="border-right">
         <pre>
-function addOne(trace: Trace): Trace {
-  const { value, history } = trace;
+function addOne(log: Log): Log {
+  const { value, history } = log;
   const plusOne = value + 1;
   const newHistory = history.concat(["addOne called"]);
   return {
@@ -386,8 +395,8 @@ addOne({ value: 4, history: [] })
       </div>
       <div>
         <pre>
-function ceiling(trace: Trace): Trace {
-  const { value, history } = trace;
+function ceiling(log: Log): Log {
+  const { value, history } = log;
   const ceiling = Math.ceil(value);
   const newHistory = history.concat(["ceiling called"]);
   return {
@@ -402,9 +411,9 @@ ceiling({ value: 3.5, history: ["fondue"] })
       </div>
     </div>
     <p>
-      Because all our functions now expect <em>Trace</em> objects as inputs and return <em>Trace</em> objects as outputs, we can
+      Because all our functions now expect <em>Log</em> objects as inputs and return <em>Log</em> objects as outputs, we can
       compose them however we'd like. This is similar to our original functions that took numbers as inputs and returned numbers as
-      outputs. However, rather then tracking function calls via <em>console.log</em>, we now track function calls via <em>Trace</em>
+      outputs. However, rather then tracking function calls via <em>console.log</em>, we now track function calls via <em>Log</em>
       return values.
     </p>
     <pre>
@@ -416,15 +425,15 @@ double(addOne(ceiling(double(5.2)))) // => 24, ["double", "ceiling", "addOne", "
     </pre>
     <p>
       There are a few drawbacks with our manual implementation. Much like when we manually added <em>console.log</em>s our original functions,
-      this process is very repetitive. Moreover, there is a lot more code than simply logging a string to the console. Handling <em>Trace</em>
+      this process is very repetitive. Moreover, there is a lot more code than simply logging a string to the console. Handling <em>Log</em>
       objects involved the following five steps:
     </p>
     <ol>
-      <li>extract the existing value and history from our <em>Trace</em> object</li>
+      <li>extract the existing value and history from our <em>Log</em> object</li>
       <li>perform the actual computation</li>
       <li>generate some new history</li>
       <li>combine the new history with the old history</li>
-      <li>return the new <em>Trace</em> object</li>
+      <li>return the new <em>Log</em> object</li>
     </ol>
     <p>
       The only unique feature across <em>double</em>, <em>addOne</em>, and <em>ceiling</em> is the second step of performing
@@ -434,23 +443,23 @@ double(addOne(ceiling(double(5.2)))) // => 24, ["double", "ceiling", "addOne", "
     <h3>Using the map decorator</h3>
     <p>
       Much like our <em>traceCall</em> decorator added appropriate <em>console.log</em> statements to an initial function, our new
-      <em>map</em> decorator will enhance an initial function to accept and return <em>Trace</em> objects. It will achieve this by
+      <em>map</em> decorator will enhance an initial function to accept and return <em>Log</em> objects. It will achieve this by
       abstracting out the following steps as seen in the manual modification process:
     </p>
     <ol>
-      <li>extract the existing value and history from an inputted <em>Trace</em> object</li>
+      <li>extract the existing value and history from an inputted <em>Log</em> object</li>
       <li>use the given function to perform some computation</li>
       <li>generate some new history</li>
       <li>combine the new history with the old history</li>
-      <li>return the new <em>Trace</em> object</li>
+      <li>return the new <em>Log</em> object</li>
     </ol>
     <p>
       Here are the above steps translated into code form.
     </p>
     <pre>
 function map(fn: (x: number) => number) {
-  return function(trace: Trace): Trace {
-    const { value, history } = trace;
+  return function(log: Log): Log {
+    const { value, history } = log;
     const newValue = fn(value);
     <%= "const newHistory = history.concat([`${fn.name} called`]);" %>
     return {
@@ -500,20 +509,20 @@ map(double)(
     </p>
     <p>
       At this point one might wonder why we've named our decorator <em>map</em>. We'll soon see that our <em>map</em> decorator
-      is essentially the same as lodash's <em>map</em> function. Let's take a look at lodash's <em>map</em>'s type signature:
+      very similar to lodash's <em>map</em> function. Let's take a look at lodash's <em>map</em>'s type signature:
     </p>
     <pre>
 function lodashMap&lt;U, V&gt;(collection: Array&lt;U&gt;, fn: (u: U) => V): Array&lt;V&gt;
     </pre>
     <p>
-      In comparison, here is a more generic type signature for our <em>map</em> and <em>Trace</em> objects:
+      In comparison, here are more generic versions of our <em>map</em> and <em>Log</em>:
     </p>
     <div class="row--code">
     <pre class="border-right">
-function map&lt;U, V&gt;(fn: (u: U) => V): (Trace&lt;U&gt;) => Trace&lt;V&gt;
+function map&lt;U, V&gt;(fn: (u: U) => V): (Log&lt;U&gt;) => Log&lt;V&gt;
     </pre>
     <pre>
-type Trace&lt;T&gt; = {
+type Log&lt;T&gt; = {
   value: T,
   history: string[],
 };
@@ -524,7 +533,7 @@ type Trace&lt;T&gt; = {
       rewrite <em>map</em> to take on the following uncurried form:
     </p>
     <pre>
-function map&lt;U, V&gt;(fn: (u: U) => V, trace: Trace&lt;U&gt;): Trace&lt;V&gt;
+function map&lt;U, V&gt;(fn: (u: U) => V, log: Log&lt;U&gt;): Log&lt;V&gt;
     </pre>
     <p>
       On the left is our curried <em>map</em> as originally defined, and on the right is our new, equivalent, uncurried map:
@@ -533,8 +542,8 @@ function map&lt;U, V&gt;(fn: (u: U) => V, trace: Trace&lt;U&gt;): Trace&lt;V&gt;
       <div class="border-right">
         <pre>
 function map(fn: (x: number) => number) {
-  return function(trace: Trace): Trace {
-    const { value, history } = trace;
+  return function(log: Log): Log {
+    const { value, history } = log;
     const newValue = fn(value);
     <%= "const newHistory = history.concat([`${fn.name} called`]);" %>
     return {
@@ -547,8 +556,8 @@ function map(fn: (x: number) => number) {
       </div>
       <div>
         <pre>
-function map(fn: (x: number) => number, trace: Trace) {
-  const { value, history } = trace;
+function map(fn: (x: number) => number, log: Log) {
+  const { value, history } = log;
   const newValue = fn(value);
   <%= "const newHistory = history.concat([`${fn.name} called`]);" %>
   return {
@@ -559,69 +568,109 @@ function map(fn: (x: number) => number, trace: Trace) {
         </pre>
       </div>
     </div>
-    <p>
-      Both curried and uncurried versions of <em>map</em> care about two inputs -- a function <em>fn</em> and a <em>Trace</em> object. The main difference
-      between our curried <em>map</em> and its uncurried sibling is that our curried <em>map</em> takes its arguments one at a time. On the
-      other hand, the uncurried <em>map</em> requires both the function <em>fn</em> and the <em>Trace</em> to arrive simultaneously. This means that while
-      our curried <em>map</em> can use it's altered <em>fn</em> whenever it wants, the curried map must immediately invoke it.
-    </p>
-
-    <p>Here we can see usage of <em>map</em> both with and without immediately invoking the function decorated by <em>map</em>
-    <div class="row--code">
-      <pre class="border-right">
-// generate an alteredDouble function
-// but don't do anything yet
-const alteredDouble = map(double);
-
-// do some other stuff
-console.log("HI");
-
-// use our altered double function
-alteredDouble(buildTrace(12));
-  // => { value: 24, history: ["double called"]
-      </pre>
-
-      <pre>
-// immediately invoke our altered double function
-map(double)(buildTrace(12));
-  // { value: 24, history: ["double called" ] }
-      </pre>
-    </div>
-    <p>On the other hand, the uncurried <em>map</em> requires both arguments to come at once.</p>
-    <pre>
-map(double, buildTrace(12)); // => { value: 24, history: ["double called" ] }
-    </pre
-    <p>
-      It should be noted that this uncurried <em>map</em> has more or less the same as <em>lodash</em>'s <em>map</em> signature. The only differences
-      are that the order of arguments have been reversed, and that where our <em>map</em> operates on <em>Trace</em> objects, <em>lodash</em>'s <em>map</em>
-      operates on <em>Array</em>s.
+      Now let's compare our uncurried <em>map</em> with <em>lodash</em>'s <em>map</em>.
     </p>
     <pre>
 function lodashMap&lt;U, V&gt;(collection: Array&lt;U&gt;, fn: (u: U) => V): Array&lt;V&gt;
-function       map&lt;U, V&gt;(fn: (u: U) => V, trace: Trace&lt;U&gt;): Trace&lt;V&gt;
+function       map&lt;U, V&gt;(fn: (u: U) => V,          log: Log&lt;U&gt;): Log&lt;V&gt;
     </pre>
-    <h3>A functor is a mappable data structure</h3>
     <p>
-
+      Here we see two differences in function shapes. A minor difference is that the order of arguments are reversed -- lodash expects the array
+      to be passed in first, whereas we expect the function to be passed in first. The second, more interesting difference is that while our <em>map</em>
+      operates on <em>Log</em> objects, <em>lodash</em>'s <em>map</em> operates on <em>Array</em>s. These are
+      very different data structures, but their respective <em>map</em>s conceptually do very similar things.
+    </p>
+    <h3>A functor is a mappable structure</h3>
+    <p>
+      The similarity between our <em>Log</em>'s <em>map</em> and an array's <em>map</em> is not an isolated occurrence. There are many more
+      structures such as <em>Promise</em> and <em>Maybe</em> that can have very similar <em>map</em> functions defined for them. Collectively,
+      if these mappable structures obey certain other laws, they are known as functors. Here is a definition of a functor:
     </p>
     <p>
-      Thus our <em>map</em> decorator and lodash's <em>map</em> function are more or less the same.
+      A functor contains two components:
+      <ul>
+        <li>
+          A structure that wraps a value or value
+          <pre>
+type Functor&lt;T&gt;;
+          </pre>
+        </li>
+        <li>
+          A <em>map</em> function in the shape of:
+          <pre>
+function map&lt;U, V&gt;(fn: (u: U) => V, f: Functor&lt;U&gt;): Functor&lt;V&gt;;
+          </pre>
+        </li>
+      </ul>
     </p>
-    <p>
-      Inverting <em>map</em>'s arguments from the typical JavaScript implementation allows us to view <em>map</em> in a different light. We would
-      usually think of mapping an array as iterating through an array, applying a function to each element of that array, and finally returning a new
-      array with the collected results. We can now think of it as the following -- given a function that transforms an element A into an element B,
-      we can create a new function that transforms an array of element As into an array of element Bs.
+    <p>Moreover, a functor should obey the following laws:</p>
+      <ul>
+        <li>
+          <div class="row--code">
+            <div class="border-right">
+              Identity law
+              <pre>
+    map(identity, functor) &#65309; identity(functor)
+              </pre>
+            </div>
+            <div>
+              where <em>identity</em> is a function that directly returns its argument:
+              <pre>
+function identity&lt;T&gt;(x: T): T {
+  return x;
+}
+              </pre>
+            </div>
+          </div>
+        </li>
+        <li>
+          Composition law
+          <pre>
+map((x) => f(g(x)), functor) &#65309; map(f, map(g, functor))
+          </pre>
+        </li>
+      </ul>
+      <p>
+        Here we hit a minor roadblock. Our our <em>Log</em> functor is not actually a functor! Namely, our log's
+        <em>history</em> property obeys neither the identity law nor the composition law.
+      </p>
     </p>
+    <h3>Decomposing map into two stages</h3>
     <p>
-      This leads us to the following definition of a functor -- a functor is a mappable data structure.
+      Upon closer examination, our original curried <em>map</em> function does two conceptually different things. We can divide it into two stages:
     </p>
     <ol>
-      <li>map(identity)(buildTrace(number)) == identity(buildTrace(number))</li>
-      <li>map(f(g(x)))(buildTrace(number)) == map(f)(map(g)(buildTrace(number)))
+      <li>
+        <p>
+          A decorator that converts a function in the shape of
+          <pre>
+(number) => number
+          </pre>
+          into a function in the shape of
+          <pre>
+(number) => Log
+          </pre>
+          It is responsible for building an initial <em>Log</em> object.
+        </p>
+      </li>
+      <li>
+        <p>
+          A decorator that converts a function in the shape of
+          <pre>
+(number) => Log
+          </pre>
+          into a function in the shape of
+          <pre>
+(Trace) => Log
+          </pre>
+          It is responsible for gluing two <em>Log</em> objects together.
+        </p>
+      </li>
     </ol>
-
-    <h3>Decomposing map into two stages</h3>
-    <p>We've achieved our original objective of </p>
+    </div>
+    <p>
+      We will soon see that our second decorator is called <em>flatMap</em>, and that we can call flatMappable structures monads. But first let's
+      provide some motivation as to why we'd want to decompose one decorator into two decorators in the first place.
+    </p>
   </body>
 </html>
