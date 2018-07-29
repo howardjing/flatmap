@@ -4,10 +4,15 @@
   <head>
     <meta charset="UTF-8">
     <title><%= htmlWebpackPlugin.options.title %></title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/themes/prism.min.css" />
     <style>
       body {
         margin: 0 auto;
         width: 1000px;
+      }
+      pre[class*=language] {
+        background: white;
+        padding: 0;
       }
       .row {
         display: flex;
@@ -18,7 +23,7 @@
         justify-content: flex-start;
       }
       .border-sides {
-        padding-left: 20px;
+        padding-left: 18px;
         border-left: 1px solid #aaa;
         border-right: 1px solid #aaa;
       }
@@ -34,13 +39,13 @@
     <p>
       Let's provide some motivation for working with monads, i.e. flatMappable structures. We will explore different ways to add logging to a function in JavaScript
       (augmented with Flow type annotations), ultimately arriving at a flatMap approach. We will first visualize our functions as a pipe that takes in an input and
-      returns an output. We will then manually add our extra behavior using <em>console.log</em>. We will then use a decorator function to perform the same modification
-      automatically. We will then explore further implementations without using <em>console.log</em>. We will first use <em>map</em> and define a functor. We will
-      then use <em>flatMap</em> and define a monad. Finally we will refactor our <em>flatMap</em> implementation into idiomatic JavaScript.
+      returns an output. We will then manually add our extra behavior using <code>console.log</code>. We will then use a decorator function to perform the same modification
+      automatically. We will then explore further implementations without using <code>console.log</code>. We will first use <code>map</code> and define a functor. We will
+      then use <code>flatMap</code> and define a monad. Finally we will refactor our <code>flatMap</code> implementation into idiomatic JavaScript.
 
     <h3>Initial functions</h3>
     <p>
-      Let's examine a few initial functions: <em>double</em>, <em>addOne</em>, and <em>ceiling</em>. We will be exploring ways of modifying these
+      Let's examine a few initial functions: <code>double</code>, <code>addOne</code>, and <code>ceiling</code>. We will be exploring ways of modifying these
       functions while keeping their essence intact. For simplicity, all our functions take in a number as input and return a number as output. This allows us
       to combine our functions together in any order we want.
     </p>
@@ -50,64 +55,52 @@
             double
       5 -> ======== -> 10
         </div>
-        <pre>
-function double(x: number): number {
+        <pre><code class="language-flow">function double(x: number): number {
   return x * 2;
-}
-        </pre>
-        <p><em>double</em> doubles its input.</p>
+}</code></pre>
+        <p><code>double</code> doubles its input.</p>
       </div>
       <div class="border-sides">
         <div id="add-one">
         addOne
     6 -> ======== -> 7
         </div>
-        <pre>
-function addOne(x: number): number {
+        <pre><code class="language-flow">function addOne(x: number): number {
   return x + 1;
-}
-        </pre>
-        <p><em>addOne</em> adds one to its input.</p>
+}</code></pre>
+        <p><code>addOne</code> adds one to its input.</p>
       </div>
       <div>
         <div id="ceiling">
             ceiling
     10.5 -> ========= -> 11
         </div>
-        <pre>
-function ceiling(x: number): number {
+        <pre><code class="language-flow">function ceiling(x: number): number {
   return Math.ceil(x);
-}
-        </pre>
-        <p><em>ceiling</em> rounds its input to the next highest integer.</p>
+}</code></pre>
+        <p><code>ceiling</code> rounds its input to the next highest integer.</p>
       </div>
     </div>
     <h3>Using our functions</h3>
-    <p>Here are a few ways we can compose the functions <em>double</em>, <em>addOne</em>, and <em>ceiling</em>.
+    <p>Here are a few ways we can compose the functions <code>double</code>, <code>addOne</code>, and <code>ceiling</code>.
 
     <div id="compose-normal-1">
         double              ceiling            addOne
 5.2 -> ======== -> 10.4 -> ========= -> 11 -> ======== -> 12
     </div>
-    <pre>
-addOne(ceiling(double(5.2))) // => 12
-    </pre>
+    <pre><code class="language-flow">addOne(ceiling(double(5.2))) // => 12</code></pre>
 
     <div id="compose-normal-2">
         addOne             double              ceiling
 5.2 -> ======== -> 6.2 -> ======== -> 12.4 -> ========= -> 13
     </div>
-    <pre>
-ceiling(double(addOne(5.2))) // => 13
-    </pre>
+    <pre><code class="language-flow">ceiling(double(addOne(5.2))) // => 13</code></pre>
 
     <div id="compose-normal-3">
         double              addOne              double               ceiling
 5.2 -> ======== -> 10.4 -> ======== -> 11.4 -> ========= -> 22.8 -> ========= -> 23
     </div>
-    <pre>
-ceiling(double(addOne(double(5.2)))) // => 23
-    </pre>
+    <pre><code class="language-flow">ceiling(double(addOne(double(5.2)))) // => 23</code></pre>
     <p>Because all inputs and outputs are compatible with each other, we can combine our functions in any order.</p>
 
     <h3>How can we trace function calls?</h3>
@@ -132,12 +125,10 @@ ceiling(double(addOne(double(5.2)))) // => 23
             V
         double was called
       </div>
-      <pre>
-function double(x: number): number {
+      <pre><code class="language-flow">function double(x: number): number {
   console.log("double was called")
   return x * 2;
-}
-      </pre>
+}</code></pre>
     </div>
 
     <div class="border-sides">
@@ -148,12 +139,10 @@ function double(x: number): number {
             V
         addOne was called
       </div>
-      <pre>
-function addOne(x: number): number {
+      <pre><code class="language-flow">function addOne(x: number): number {
   console.log("addOne was called")
   return x + 1;
-}
-      </pre>
+}</code></pre>
     </div>
 
     <div>
@@ -164,25 +153,21 @@ function addOne(x: number): number {
             V
         addOne was called
       </div>
-      <pre>
-function ceiling(x: number): number {
+      <pre><code class="language-flow">function ceiling(x: number): number {
   console.log("addOne was called")
   return Math.ceil(x);
-}
-      </pre>
+}</code></pre>
     </div>
     </div>
     <p>
-      Here we've manually added a <em>console.log</em> statement to each one of our original functions. Simply adding <em>console.log</em> does not
+      Here we've manually added a <code>console.log</code> statement to each one of our original functions. Simply adding <code>console.log</code> does not
       affect the return value of our functions. Because inputs and outputs are not affected, we can compose our new functions as we did our
       old ones.
     </p>
     <div id="compose-altered"></div>
-    <pre>
-addOne(ceiling(double(5.2))) // => 12
-    </pre>
+    <pre><code class="language-flow">addOne(ceiling(double(5.2))) // => 12</code></pre>
     <p>
-      However, manually modifying each function is quite tedious and error prone. In fact, our new <em>ceiling</em> has a bug.
+      However, manually modifying each function is quite tedious and error prone. In fact, our new <code>ceiling</code> has a bug.
       Rather than logging "ceiling called", it logs "addOne called." This type of copy paste bug can be quite easy to miss. Can we devise a less
       labor intensive, less error prone approach?
     </p>
@@ -193,70 +178,66 @@ addOne(ceiling(double(5.2))) // => 12
       execute some predefined behavior (in our case it will log out the original function's name) and then return the result of calling the original function.
     </p>
     <p>
-      Let's define a decorator called <em>logName</em>. Our <em>logName</em> decorator will take a function in the shape of <em>double</em>, <em>addOne</em>,
-      or <em>ceiling</em> as input. It will return a new function i.e. <em>double'</em>, <em>addOne'</em>, or <em>ceiling'</em>. This returned function will
+      Let's define a decorator called <code>logName</code>. Our <code>logName</code> decorator will take a function in the shape of <code>double</code>, <code>addOne</code>,
+      or <code>ceiling</code> as input. It will return a new function i.e. <code>double’</code>, <code>addOne’</code>, or <code>ceiling’</code>. This returned function will
       log the original function's name before returning the newly computed value. In order to retrieve the original function's name, we will be using the
-      function's <em>name</em> property to dynamically determine the correct name to log out.
+      function's <code>name</code> property to dynamically determine the correct name to log out.
     </p>
     <p>
-      As an aside, <em>double'</em>, <em>addOne'</em>, and <em>ceiling'</em> are not valid JavaScript names. Single quotes are not allowed within function names.
+      As an aside, <code>double’</code>, <code>addOne’</code>, and <code>ceiling’</code> are not valid JavaScript names. Single quotes are not allowed within function names.
       Let's ignore this -- we use the single quote to denote that our original function has been altered.
     </p>
     <div id="double-decorated"></div>
-    <pre>
-function logName(fn: (number) => number) {
+    <div class="row--code">
+    <div class="border-right">
+    <pre><code class="language-flow">function logName(fn: (number) => number) {
   return function(x: number) {
     <%= "console.log(`${f.name} was called`);" %>
     return f(x);
   }
-}
-
-const double' = logName(double);
-double'(3) // => 6
-
+}</code></pre>
+    </div>
+    <div>
+    <pre><code class="language-flow">// we can use logName as follows:
+const double’ = logName(double);
+double’(3) // => 6
 // or equivalently
-
-logName(double)(3) // => 6
-    </pre>
+logName(double)(3) // => 6</code></pre>
+    </div>
+    </div>
     <p>
-      Here we see that we've generated a new function <em>double'</em> based on our existing <em>double</em>. A <em>double</em> function goes
-      in to the decorator, and a new function <em>double'</em> comes out of the decorator. Both functions double their input, but the new <em>double'</em>
-      differs from the original <em>double</em> because it logs out "double called" prior to returning its result. The original <em>double</em> does not.
-      Because both functions take in numbers as input, and return the doubled number as output, we can use the new <em>double'</em> exactly
-      as we use the original <em>double</em>.
+      Here we see that we've generated a new function <code>double'</code> based on our existing <code>double</code>. A <code>double</code> function goes
+      in to the decorator, and a new function <code>double'</code> comes out of the decorator. Both functions double their input, but the new <code>double'</code>
+      differs from the original <code>double</code> because it logs out "double called" prior to returning its result. The original <code>double</code> does not.
+      Because both functions take in numbers as input, and return the doubled number as output, we can use the new <code>double'</code> exactly
+      as we use the original <code>double</code>.
     </p>
-    <p>Let's generate modified functions for <em>addOne</em>, and <em>ceiling</em> as well.
+    <p>Let's generate modified functions for <code>addOne</code>, and <code>ceiling</code> as well.
 
     <div class="row--code">
       <div class="border-right">
         <div id="add-one-decorated"></div>
-        <pre>
-const addOne' = logName(addOne)
-addOne'(11) // => 12
-        </pre>
+        <pre><code class="language-flow">const addOne’ = logName(addOne)
+addOne’(11) // => 12</code></pre>
       </div>
       <div>
       <div id="ceiling-decorated"></div>
-        <pre>
-const ceiling' = logName(ceiling)
-ceiling'(11.1) // => 12
-        </pre>
+        <pre><code class="language-flow">const ceiling’ = logName(ceiling)
+ceiling’(11.1) // => 12</code></pre>
       </div>
     </div>
     <p>We can compose our new functions as we did our old functions.</p>
 
-    <pre>
-ceiling'(double'(addOne'(5.2))) // => 13
-    </pre>
+    <pre><code class="language-flow">ceiling’(double’(addOne’(5.2))) // => 13</code></pre>
     <div id="compose-decorated"></div>
     <p>
-      Moreover, because this modification process was automatic, we've fixed the original copy paste bug. Our modified <em>ceiling'</em> function correctly
-      logs the original <em>ceiling</em>'s name instead of logging out <em>addOne</em>'s name.
+      Moreover, because this modification process was automatic, we've fixed the original copy paste bug. Our modified <code>ceiling’</code> function correctly
+      logs the original <code>ceiling</code>'s name instead of logging out <code>addOne</code>'s name.
     </p>
     <h3>Without side effects</h3>
     <p>
       Introducing a side effect, i.e. interacting with the outside world, is a quick and easy way to tack additional behavior on to a function. Our previous implementations
-      use <em>console.log</em>, a side effect, to tell the world that a function was called. One limitation of this approach is that once we log our function call
+      use <code>console.log</code>, a side effect, to tell the world that a function was called. One limitation of this approach is that once we log our function call
       we can no longer directly interact with that data. For example, how can we find the most commonly used function? We would have to dig into our logs
       to tally up total counts.
     </p>
@@ -270,48 +251,44 @@ ceiling'(double'(addOne'(5.2))) // => 13
       However, modifying a function's return type is a very heavy handed approach. Our existing functions only know how to consume numbers. They do not know how to
       handle any extra information. If we want our functions to remain compatible with each other, we will need to modify all of them to handle this extra data.
     </p>
-    <p>For example, here we modify <em>double</em> to return extra information, but do not modify <em>addOne</em> to accept extra information:</p>
+    <p>For example, here we modify <code>double</code> to return extra information, but do not modify <code>addOne</code> to accept extra information:</p>
     <pre>
 5 -> =double===== -> { value: 5, history: ["double called"] } -!-> ===== addOne ====
     </pre>
     <p>
-      As we can see, <em>addOne</em> does not know what to do with <em>double</em>'s output, and so the program crashes. This shows us that modifying return values
-      have a much higher initial cost than simply using <em>console.log</em>. Where before we were free to mix and match logged and unlogged functions,
+      As we can see, <code>addOne</code> does not know what to do with <code>double</code>'s output, and so the program crashes. This shows us that modifying return values
+      have a much higher initial cost than simply using <code>console.log</code>. Where before we were free to mix and match logged and unlogged functions,
       we now can only use one or the other. Nevertheless, let's continue down this path.
     </p>
     <p>
-      Let's start by defining our enhanced return value. Let's call it <em>Log</em>. <em>Log</em> will have two properties -- <em>value</em>, a number, and
-      <em>history</em>, a list of strings. These strings will represent all function names that have been called up to the current point.
+      Let's start by defining our enhanced return value. Let's call it <code>Log</code>. <code>Log</code> will have two properties -- <code>value</code>, a number, and
+      <code>history</code>, a list of strings. These strings will represent all function names that have been called up to the current point.
     </p>
     <div class="row--code">
       <div class="border-right">
         <p>
-          Here is the definition of our <em>Log</em> type:
+          Here is the definition of our <code>Log</code> type:
         </p>
-        <pre>
-type Log = {
+        <pre><code class="language-flow">type Log = {
   value: number,
   history: string[],
-};
-        </pre>
+};</code></pre>
       </div>
       <div>
-        <p>Here is an instance of a <em>Log</em> object:</p>
-        <pre>
-{
+        <p>Here is an instance of a <code>Log</code> object:</p>
+        <pre><code class="language-flow">{
   value: 30,
   history: [
     "double called",
     "ceiling called",
     "addOne called",
   ],
-}
-        </pre>
+}</code></pre>
       </div>
     </div>
     <p>
-      The above sample <em>Log</em> object has a current value of 30. Moreover our log tells us that it first passed through our <em>double</em> function. Afterwards,
-      it passed through <em>ceiling</em>, and finally <em>addOne</em>. Based on that, here is one possible way to generate this log:
+      The above sample <code>Log</code> object has a current value of 30. Moreover our log tells us that it first passed through our <code>double</code> function. Afterwards,
+      it passed through <code>ceiling</code>, and finally <code>addOne</code>. Based on that, here is one possible way to generate this log:
     </p>
     <pre>
 14.1 -> double -> 28.2 -> ceiling -> 29 -> addOne -> 30
@@ -329,31 +306,28 @@ type Log = {
                                                                     }
     </pre>
     <p>
-      From the above diagram, we see that we've modified our functions to accept <em>Log</em> objects as inputs and return
-      <em>Log</em> objects as outputs. Moreover, we kick things off by wrapping our original number in an initial <em>Log</em> object.
-      This inaugural wrapping allows us to start using our <em>Log</em> enhanced functions.
+      From the above diagram, we see that we've modified our functions to accept <code>Log</code> objects as inputs and return
+      <code>Log</code> objects as outputs. Moreover, we kick things off by wrapping our original number in an initial <code>Log</code> object.
+      This inaugural wrapping allows us to start using our <code>Log</code> enhanced functions.
     </p>
     <p>
-      Here is a utility function that generates our initial <em>Log</em> object:
+      Here is a utility function that generates our initial <code>Log</code> object:
     </p>
-    <pre>
-function buildLog(value: number): Log {
+    <pre><code class="language-flow">function buildLog(value: number): Log {
   return {
     value: value,
     history: [],
   };
-}
-    </pre>
+}</code></pre>
     <p>
-      We insert our given number into the <em>Log</em> object we generate. Because no relevant functions have been called yet, we initialize
-      <em>history</em> to an empty array. This fresh <em>Log</em> object will be the starting point to interact with our other functions.
+      We insert our given number into the <code>Log</code> object we generate. Because no relevant functions have been called yet, we initialize
+      <code>history</code> to an empty array. This fresh <code>Log</code> object will be the starting point to interact with our other functions.
     </p>
     <p>Now we must figure out how to modify our functions to accept and return logs.</p>
     <h3>A manual approach</h3>
     <p>Let's start with the manual approach.</p>
 
-    <pre>
-function double(log: Log): Log {
+    <pre><code class="language-flow">function double(log: Log): Log {
   const { value, history } = log;
   const doubled = value * 2;
   const newHistory = history.concat(["double called"]);
@@ -363,23 +337,21 @@ function double(log: Log): Log {
   };
 }
 
-double({ value: 3, history: ["cheese"] }) // => { value: 6, history: ["cheese", "double called"] }
-    </pre>
+double({ value: 3, history: ["cheese"] }) // => { value: 6, history: ["cheese", "double called"] }</code></pre>
     <p>
-      Here we see our enhanced <em>double</em> function. Rather than dealing with <em>number</em> inputs and outputs, it deals with <em>Log</em> inputs
-      and outputs. As a result, it can no longer interact with <em>addOne</em> and <em>ceiling</em>.
+      Here we see our enhanced <code>double</code> function. Rather than dealing with <code>number</code> inputs and outputs, it deals with <code>Log</code> inputs
+      and outputs. As a result, it can no longer interact with <code>addOne</code> and <code>ceiling</code>.
     </p>
     <pre>
 { ... } -> double -> { ... } -!-> addOne
     </pre>
     <p>
-      Let's modify <em>addOne</em>, and
-      <em>ceiling</em> to handle <em>Log</em>s as well.
+      Let's modify <code>addOne</code>, and
+      <code>ceiling</code> to handle <code>Log</code>s as well.
     </p>
     <div class="row--code">
       <div class="border-right">
-        <pre>
-function addOne(log: Log): Log {
+        <pre><code class="language-flow">function addOne(log: Log): Log {
   const { value, history } = log;
   const plusOne = value + 1;
   const newHistory = history.concat(["addOne called"]);
@@ -390,12 +362,10 @@ function addOne(log: Log): Log {
 }
 
 addOne({ value: 4, history: [] })
-  // => { value: 5, history: ["addOne called"] }
-        </pre>
+  // => { value: 5, history: ["addOne called"] }</code></pre>
       </div>
       <div>
-        <pre>
-function ceiling(log: Log): Log {
+        <pre><code class="language-flow">function ceiling(log: Log): Log {
   const { value, history } = log;
   const ceiling = Math.ceil(value);
   const newHistory = history.concat(["ceiling called"]);
@@ -406,84 +376,77 @@ function ceiling(log: Log): Log {
 }
 
 ceiling({ value: 3.5, history: ["fondue"] })
-  // => { value: 4, history: ["fondue", "ceiling called"] }
-        </pre>
+  // => { value: 4, history: ["fondue", "ceiling called"] }</code></pre>
       </div>
     </div>
     <p>
-      Because all our functions now expect <em>Log</em> objects as inputs and return <em>Log</em> objects as outputs, we can
+      Because all our functions now expect <code>Log</code> objects as inputs and return <code>Log</code> objects as outputs, we can
       compose them however we'd like. This is similar to our original functions that took numbers as inputs and returned numbers as
-      outputs. However, rather then tracking function calls via <em>console.log</em>, we now track function calls via <em>Log</em>
+      outputs. However, rather then tracking function calls via <code>console.log</code>, we now track function calls via <code>Log</code>
       return values.
     </p>
     <pre>
                         double              ceiling            addOne            double
 5.2 -> { 5.2, [] } -> ======== -> 10.4 -> ========= -> 11 -> ======== -> 12 -> ======== 24
     </pre>
-    <pre>
-double(addOne(ceiling(double(5.2)))) // => 24, ["double", "ceiling", "addOne", "double"]
-    </pre>
+    <pre><code class="language-flow">double(addOne(ceiling(double(5.2)))) // => 24, ["double", "ceiling", "addOne", "double"]</code></pre>
     <p>
-      There are a few drawbacks with our manual implementation. Much like when we manually added <em>console.log</em>s our original functions,
-      this process is very repetitive. Moreover, there is a lot more code than simply logging a string to the console. Handling <em>Log</em>
+      There are a few drawbacks with our manual implementation. Much like when we manually added <code>console.log</code>s our original functions,
+      this process is very repetitive. Moreover, there is a lot more code than simply logging a string to the console. Handling <code>Log</code>
       objects involved the following five steps:
     </p>
     <ol>
-      <li>extract the existing value and history from our <em>Log</em> object</li>
+      <li>extract the existing value and history from our <code>Log</code> object</li>
       <li>perform the actual computation</li>
       <li>generate some new history</li>
       <li>combine the new history with the old history</li>
-      <li>return the new <em>Log</em> object</li>
+      <li>return the new <code>Log</code> object</li>
     </ol>
     <p>
-      The only unique feature across <em>double</em>, <em>addOne</em>, and <em>ceiling</em> is the second step of performing
+      The only unique feature across <code>double</code>, <code>addOne</code>, and <code>ceiling</code> is the second step of performing
       the actual computation. All other steps are more or less the same. This suggests that we can create a decorator function
       to abstract away much of the repetition.
     </p>
     <h3>Using the map decorator</h3>
     <p>
-      Much like our <em>traceCall</em> decorator added appropriate <em>console.log</em> statements to an initial function, our new
-      <em>map</em> decorator will enhance an initial function to accept and return <em>Log</em> objects. It will achieve this by
+      Much like our <code>traceCall</code> decorator added appropriate <code>console.log</code> statements to an initial function, our new
+      <code>map</code> decorator will enhance an initial function to accept and return <code>Log</code> objects. It will achieve this by
       abstracting out the following steps as seen in the manual modification process:
     </p>
     <ol>
-      <li>extract the existing value and history from an inputted <em>Log</em> object</li>
+      <li>extract the existing value and history from an inputted <code>Log</code> object</li>
       <li>use the given function to perform some computation</li>
       <li>generate some new history</li>
       <li>combine the new history with the old history</li>
-      <li>return the new <em>Log</em> object</li>
+      <li>return the new <code>Log</code> object</li>
     </ol>
     <p>
       Here are the above steps translated into code form.
     </p>
-    <pre>
-function map(fn: (x: number) => number) {
+    <pre><code class="language-flow">function map(fn: (x: number) => number) {
   return function(log: Log): Log {
     const { value, history } = log;
     const newValue = fn(value);
-    <%= "const newHistory = history.concat([`${fn.name} called`]);" %>
+    <%= "const newHistory = [`${fn.name} called`];" %>
     return {
       value: newValue,
-      history: newHistory,
+      history: history.concat(newHistory),
     };
   }
-}
-    </pre>
+}</code></pre>
     <p>
-      Notice how similar this <em>map</em> implementation is to our manually modified functions. Here is how we can use it to generate
-      <em>double'</em>, <em>addOne'</em>, and <em>ceiling'</em> dopplegangers based on our original <em>double</em>, <em>addOne</em>, and
-      <em>ceiling</em> functions.
+      Notice how similar this <code>map</code> implementation is to our manually modified functions. Here is how we can use it to generate
+      <code>double’</code>, <code>addOne’</code>, and <code>ceiling’</code> dopplegangers based on our original <code>double</code>, <code>addOne</code>, and
+      <code>ceiling</code> functions.
     </p>
     <pre>
     = double = -> === map === -> = double' =
     = addOne = -> === map === -> = addOne' =
     = ceiling = -> === ceiling === -> = ceiling' =
     </pre>
-    <pre>
-const double' = map(double);
-const addOne' = map(addOne);
-const ceiling' = map(ceiling);
-    </pre>
+    <pre><code class="language-flow">const double’ = map(double);
+const addOne’ = map(addOne);
+const ceiling’ = map(ceiling);</code></pre>
     <p>
       Usage of our newly generated functions is exactly the same as when we manually made them.
     </p>
@@ -491,99 +454,74 @@ const ceiling' = map(ceiling);
                         double              ceiling            addOne            double
 5.2 -> { 5.2, [] } -> ======== -> 10.4 -> ========= -> 11 -> ======== -> 12 -> ======== 24
     </pre>
-    <pre>
-double'(addOne'(ceiling'(double'(buildTrace(5.2))))) // => 24, ["double", "ceiling", "addOne", "double"]
-map(double)(
-  map(addOne)(
-    map(ceiling)(
-      map(double)(
-        buildTrace(5.2)
-      )
-    )
-  )
-) // => 24, ["double", "ceiling", "addOne", "double"]
-    </pre>
+    <pre><code class="language-flow">double’(addOne’(ceiling’(double’(buildLog(5.2))))) // => 24, ["double", "ceiling", "addOne", "double"]</code></pre>
     <p>
-      What have we accomplished by defining <em>map</em>? We have created a mechanism where given a function that takes numbers to numbers,
-      we can now generate a very similar function that takes <em>Trace</em>s to <em>Trace</em>s.
+      What have we accomplished by defining <code>map</code>? We have created a mechanism where given a function that takes numbers to numbers,
+      we can now generate a very similar function that takes <code>Log</code>s to <em>Log</em>s.
     </p>
     <p>
-      At this point one might wonder why we've named our decorator <em>map</em>. We'll soon see that our <em>map</em> decorator
-      very similar to lodash's <em>map</em> function. Let's take a look at lodash's <em>map</em>'s type signature:
+      At this point one might wonder why we've named our decorator <code>map</code>. We'll soon see that our <code>map</code> decorator
+      very similar to lodash's <code>map</code> function. Let's take a look at lodash's <code>map</code>'s type signature:
     </p>
-    <pre>
-function lodashMap&lt;U, V&gt;(collection: Array&lt;U&gt;, fn: (u: U) => V): Array&lt;V&gt;
-    </pre>
+    <pre><code class="language-flow">function lodashMap&lt;U, V&gt;(collection: Array&lt;U&gt;, fn: (u: U) => V): Array&lt;V&gt;</code></pre>
     <p>
-      In comparison, here are more generic versions of our <em>map</em> and <em>Log</em>:
+      In comparison, here are more generic versions of our <code>map</code> and <code>Log</code>:
     </p>
     <div class="row--code">
-    <pre class="border-right">
-function map&lt;U, V&gt;(fn: (u: U) => V): (Log&lt;U&gt;) => Log&lt;V&gt;
-    </pre>
-    <pre>
-type Log&lt;T&gt; = {
+    <pre class="border-right"><code class="language-flow">function map&lt;U, V&gt;(fn: (u: U) => V): (Log&lt;U&gt;) => Log&lt;V&gt;</code></pre>
+    <pre><code class="language-flow">type Log&lt;T&gt; = {
   value: T,
   history: string[],
-};
-    </pre>
+};</code></pre>
     </div>
     <p>
-      Our <em>map</em>'s type signature is the curried form of the following signature for <em>map</em> -- we can easily
-      rewrite <em>map</em> to take on the following uncurried form:
+      Our <code>map</code>'s type signature is the curried form of the following signature for <code>map</code> -- we can easily
+      rewrite <code>map</code> to take on the following uncurried form:
     </p>
-    <pre>
-function map&lt;U, V&gt;(fn: (u: U) => V, log: Log&lt;U&gt;): Log&lt;V&gt;
-    </pre>
+    <pre><code class="language-flow">function map&lt;U, V&gt;(fn: (u: U) => V, log: Log&lt;U&gt;): Log&lt;V&gt;</code></pre>
     <p>
-      On the left is our curried <em>map</em> as originally defined, and on the right is our new, equivalent, uncurried map:
+      On the left is our curried <code>map</code> as originally defined, and on the right is our new, equivalent, uncurried <code>map</code>:
     </p>
     <div class="row--code">
       <div class="border-right">
-        <pre>
-function map(fn: (x: number) => number) {
+        <pre><code class="language-flow">function map(fn: (x: number) => number) {
   return function(log: Log): Log {
     const { value, history } = log;
     const newValue = fn(value);
-    <%= "const newHistory = history.concat([`${fn.name} called`]);" %>
+    <%= "const newHistory = [`${fn.name} called`];" %>
     return {
       value: newValue,
-      history: newHistory,
+      history: history.concat(newHistory),
     };
   }
-}
-        </pre>
+}</code></pre>
       </div>
       <div>
-        <pre>
-function map(fn: (x: number) => number, log: Log) {
+        <pre><code class="language-flow">function map(fn: (x: number) => number, log: Log) {
   const { value, history } = log;
   const newValue = fn(value);
-  <%= "const newHistory = history.concat([`${fn.name} called`]);" %>
+  <%= "const newHistory = [`${fn.name} called`];" %>
   return {
     value: newValue,
-    history: newHistory,
+    history: history.concat(newHistory),
   };
-}
-        </pre>
+}</code></pre>
       </div>
     </div>
-      Now let's compare our uncurried <em>map</em> with <em>lodash</em>'s <em>map</em>.
+      Now let's compare our uncurried <code>map</code> with <codeem>lodash</code>'s <code>map</code>.
     </p>
-    <pre>
-function lodashMap&lt;U, V&gt;(collection: Array&lt;U&gt;, fn: (u: U) => V): Array&lt;V&gt;
-function       map&lt;U, V&gt;(fn: (u: U) => V,          log: Log&lt;U&gt;): Log&lt;V&gt;
-    </pre>
+    <pre><code class="language-flow">function lodashMap&lt;U, V&gt;(collection: Array&lt;U&gt;, fn: (u: U) => V): Array&lt;V&gt;
+function       map&lt;U, V&gt;(fn: (u: U) => V,          log: Log&lt;U&gt;): Log&lt;V&gt;</code></pre>
     <p>
       Here we see two differences in function shapes. A minor difference is that the order of arguments are reversed -- lodash expects the array
-      to be passed in first, whereas we expect the function to be passed in first. The second, more interesting difference is that while our <em>map</em>
-      operates on <em>Log</em> objects, <em>lodash</em>'s <em>map</em> operates on <em>Array</em>s. These are
-      very different data structures, but their respective <em>map</em>s conceptually do very similar things.
+      to be passed in first, whereas we expect the function to be passed in first. The second, more interesting difference is that while our <code>map</code>
+      operates on <code>Log</code> objects, <code>lodash</code>'s <code>map</code> operates on <code>Array</code>s. These are
+      very different data structures, but their respective <code>map</code>s conceptually do very similar things.
     </p>
     <h3>A functor is a mappable structure</h3>
     <p>
-      The similarity between our <em>Log</em>'s <em>map</em> and an array's <em>map</em> is not an isolated occurrence. There are many more
-      structures such as <em>Promise</em> and <em>Maybe</em> that can have very similar <em>map</em> functions defined for them. Collectively,
+      The similarity between our <code>Log</code>'s <code>map</code> and an array's <code>map</code> is not an isolated occurrence. There are many more
+      structures such as <code>Promise</code> and <code>Maybe</code> that can have very similar <code>map</code> functions defined for them. Collectively,
       if these mappable structures obey certain other laws, they are known as functors. Here is a definition of a functor:
     </p>
     <p>
@@ -591,15 +529,11 @@ function       map&lt;U, V&gt;(fn: (u: U) => V,          log: Log&lt;U&gt;): Log
       <ul>
         <li>
           A structure that wraps a value or value
-          <pre>
-type Functor&lt;T&gt;;
-          </pre>
+          <pre><code class="language-flow">type Functor&lt;T&gt;;</code></pre>
         </li>
         <li>
-          A <em>map</em> function in the shape of:
-          <pre>
-function map&lt;U, V&gt;(fn: (u: U) => V, f: Functor&lt;U&gt;): Functor&lt;V&gt;;
-          </pre>
+          A <code>map</code> function in the shape of:
+          <pre><code class="language-flow">function map&lt;U, V&gt;(fn: (u: U) => V, f: Functor&lt;U&gt;): Functor&lt;V&gt;;</code></pre>
         </li>
       </ul>
     </p>
@@ -609,68 +543,113 @@ function map&lt;U, V&gt;(fn: (u: U) => V, f: Functor&lt;U&gt;): Functor&lt;V&gt;
           <div class="row--code">
             <div class="border-right">
               Identity law
-              <pre>
-    map(identity, functor) &#65309; identity(functor)
-              </pre>
+              <pre><code class="language-flow">map(identity, functor) &#65309; identity(functor)</code></pre>
             </div>
             <div>
-              where <em>identity</em> is a function that directly returns its argument:
-              <pre>
-function identity&lt;T&gt;(x: T): T {
+              where <code>identity</code> is a function that directly returns its argument:
+              <pre><code class="language-flow">function identity&lt;T&gt;(x: T): T {
   return x;
-}
-              </pre>
+}</code></pre>
             </div>
           </div>
         </li>
         <li>
           Composition law
-          <pre>
-map((x) => f(g(x)), functor) &#65309; map(f, map(g, functor))
-          </pre>
+          <pre><code class="language-flow">map((x) => f(g(x)), functor) &#65309; map(f, map(g, functor))</code></pre>
         </li>
       </ul>
-      <p>
-        Here we hit a minor roadblock. Our our <em>Log</em> functor is not actually a functor! Namely, our log's
-        <em>history</em> property obeys neither the identity law nor the composition law.
-      </p>
+    </p>
+    <p>
+      Here we hit a minor roadblock. Our <code>Log</code> functor is not actually a functor! Namely, our log's
+      <code>history</code> property obeys neither the identity law nor the composition law. Let's show an example:
+    </p>
+    <p>The identity law does not hold:</p>
+    <pre><code class="language-flow">// left hand side of identity law
+map(identity, buildLog(1)) // => { value: 1, history: ["identity called"] }
+
+// right hand side of identity law
+identity(buildLog(1))      // => { value: 1, history: [] }</code></pre>
+    <p>The composition law does not hold:</p>
+    <pre><code class="language-flow">const f = (x) => x + 1;
+const g = (x) => x + 2;
+const gThenF = (x) => f(g(x));
+
+// left hand side of composition law
+map(gThenF, buildLog(1))    // { value: 4, history: [ 'gThenF called' ] }
+
+// right hand side of composition law
+map(f, map(g, buildLog(1))) // { value: 4, history: [ 'g called', 'f called' ] }</code></pre>
+    <p>Let's adjust <code>map</code> definition to satisfy the functor laws:</p>
+    <pre><code class="language-flow">function map&lt;U, V&gt; (fn: (u: U) => V, log: Log&lt;U&gt;) {
+  const { value, history } = log;
+  const newValue = fn(value);
+
+  // instead of generating new history, we add nothing
+  const newHistory = [];
+
+  return {
+    value: newValue,
+    history: history.concat(newHistory),
+  };
+}</code></pre>
+    <p>Now we see that the identity and composition laws both hold:</p>
+    <pre><code class="language-flow">// left hand side of identity law
+map(identity, buildLog(1))  // => { value: 1, history: [] }
+
+// right hand side of identity law
+identity(buildLog(1))       // => { value: 1, history: [] }
+
+// left hand side of composition law
+map(gThenF, buildLog(1))    // { value: 4, history: [] }
+
+// right hand side of composition law
+map(f, map(g, buildLog(1))) // { value: 4, history: [] }</code></pre>
+    <p>
+      The good news -- our <code>Log</code> and <code>map</code> now form a well behaved functor! The bad news -- we are no longer
+      tracing function calls. How can we fix this?
     </p>
     <h3>Decomposing map into two stages</h3>
     <p>
-      Upon closer examination, our original curried <em>map</em> function does two conceptually different things. We can divide it into two stages:
+      Upon closer examination, our original, improperly defined <code>map</code> did two conceptually separate things.
     </p>
     <ol>
       <li>
-        <p>
-          A decorator that converts a function in the shape of
-          <pre>
-(number) => number
-          </pre>
-          into a function in the shape of
-          <pre>
-(number) => Log
-          </pre>
-          It is responsible for building an initial <em>Log</em> object.
-        </p>
+        Create a new <code>Log</code> object based on an existing <code>Log</code> object and a given function.
       </li>
       <li>
-        <p>
-          A decorator that converts a function in the shape of
-          <pre>
-(number) => Log
-          </pre>
-          into a function in the shape of
-          <pre>
-(Trace) => Log
-          </pre>
-          It is responsible for gluing two <em>Log</em> objects together.
-        </p>
+        Glue together the new <code>Log</code> with the old <code>Log</code>
       </li>
     </ol>
-    </div>
-    <p>
-      We will soon see that our second decorator is called <em>flatMap</em>, and that we can call flatMappable structures monads. But first let's
-      provide some motivation as to why we'd want to decompose one decorator into two decorators in the first place.
-    </p>
+    <pre><code class="language-flow">function map&lt;U, V&gt; (fn: (u: U) => V, log: Log&lt;U&gt;) {
+  // stage 1: create a new Log object based on an existing log object and function fn
+  const { value, history } = log;
+  const newValue = fn(value);
+  <%= "const newHistory = [`${fn.name} called`];" %>
+
+  // stage 2: glue together the new Log with the old Log
+  return {
+    value: newValue,
+    history: history.concat(newHistory),
+  };
+}</code></pre>
+    <p>Our new, properly defined <code>map</code> also follows these two stages</p>
+    <pre><code class="language-flow">function map&lt;U, V&gt; (fn: (u: U) => V, log: Log&lt;U&gt;) {
+  // stage 1: create a new Log object based on an existing log object and function fb
+  const { value, history } = log;
+  const newValue = fn(value);
+  const newHistory = [];
+
+  // stage 2: glue together the new Log with the old Log
+  return {
+    value: newValue,
+    history: history.concat(newHistory),
+  };
+}
+</code></pre>
+  <p>
+    As we can see, the second stage of both <code>map</code> functions are identical. Based on this, we can construct a
+  </p>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-flow.min.js"></script>
   </body>
 </html>
