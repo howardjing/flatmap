@@ -139,8 +139,17 @@ const higherOrderPipe = {
   color: 'purple',
 }
 
+const inputLiftedPipe = {
+  leftHeight: 40,
+  bodyWidth: 80,
+  bodyHeight: 30,
+  rightHeight: 80,
+  color: 'pink',
+}
+
 export default PipeShape;
 export {
   normalPipe,
   higherOrderPipe,
+  inputLiftedPipe,
 }

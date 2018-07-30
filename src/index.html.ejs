@@ -199,7 +199,6 @@
 double’(3)         // => 6
 // or we can immediately invoke our new function:
 logName(double)(3) // => 6</code></pre>
-    <div id="double-decorated-use"></div>
     <p>
       Here we see that we've generated a new function <code>double’</code> based on our existing <code>double</code>. A <code>double</code> function goes
       in to the decorator, and a new function <code>double’</code> comes out of the decorator. Both functions double their input, but the new <code>double’</code>
@@ -247,9 +246,7 @@ ceiling’(11.1) // => 12</code></pre>
       handle any extra information. If we want our functions to remain compatible with each other, we will need to modify all of them to handle this extra data.
     </p>
     <p>For example, here we modify <code>double</code> to return extra information, but do not modify <code>addOne</code> to accept extra information:</p>
-    <pre>
-5 -> =double===== -> { value: 5, history: ["double called"] } -!-> ===== addOne ====
-    </pre>
+    <div id="double-modified-add-one-not"></div>
     <p>
       As we can see, <code>addOne</code> does not know what to do with <code>double</code>'s output, and so the program crashes. This shows us that modifying return values
       have a much higher initial cost than simply using <code>console.log</code>. Where before we were free to mix and match logged and unlogged functions,
@@ -284,12 +281,6 @@ ceiling’(11.1) // => 12</code></pre>
     <p>
       The above sample <code>Log</code> object has a current value of 30. Moreover our log tells us that it first passed through our <code>double</code> function. Afterwards,
       it passed through <code>ceiling</code>, and finally <code>addOne</code>. Based on that, here is one possible way to generate this log:
-    </p>
-    <pre>
-14.1 -> double -> 28.2 -> ceiling -> 29 -> addOne -> 30
-    </pre>
-    <p>
-      The above diagram only shows how our number passes through our pipeline of functions. Let's now show how the log itself develops.
     </p>
     <pre>
           {                     {                                  {

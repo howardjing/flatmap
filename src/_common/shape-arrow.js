@@ -5,14 +5,18 @@ import { Shape } from './shape';
 class ArrowShape implements Shape {
   height: number;
   width: number;
+  incorrect: boolean;
 
   constructor({
     width,
+    incorrect = false,
   }: {
     width: number,
+    incorrect?: boolean,
   }) {
     this.width = width;
     this.height = 2;
+    this.incorrect = incorrect;
   }
 
   getWidth() {
@@ -25,7 +29,7 @@ class ArrowShape implements Shape {
 
   render() {
     return (
-      <Arrow height={this.height} width={this.width} />
+      <Arrow height={this.height} width={this.width} incorrect={this.incorrect} />
     );
   }
 }
@@ -33,11 +37,16 @@ class ArrowShape implements Shape {
 const Arrow = ({
   height,
   width,
+  incorrect,
 }: {
   height: number,
   width: number,
+  incorrect: boolean,
 }) => (
-  <line x1="0" y1="0" x2={width} y2="0" stroke="#000" strokeWidth={height} markerEnd="url(#arrow)" />
+  <React.Fragment>
+    <line x1="0" y1="0" x2={width} y2="0" stroke="#000" strokeWidth={height} markerEnd="url(#arrow)" />
+    {incorrect ? <line x1="0" y1="10" x2={width} y2="-10" stroke="#000" strokeWidth={height} /> : null}
+  </React.Fragment>
 );
 
 const ArrowHead = () => (
@@ -47,11 +56,13 @@ const ArrowHead = () => (
 );
 
 const DEFAULT_ARROW = new ArrowShape({ width: 15 });
+const DEFAULT_WRONG_ARROW = new ArrowShape({ width: 15, incorrect: true });
 const WIDE_ARROW = new ArrowShape({ width: 30 });
 
 export default ArrowShape;
 export {
   ArrowHead,
   DEFAULT_ARROW,
+  DEFAULT_WRONG_ARROW,
   WIDE_ARROW,
 }
