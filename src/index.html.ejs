@@ -282,15 +282,7 @@ ceiling’(11.1) // => 12</code></pre>
       The above sample <code>Log</code> object has a current value of 30. Moreover our log tells us that it first passed through our <code>double</code> function. Afterwards,
       it passed through <code>ceiling</code>, and finally <code>addOne</code>. Based on that, here is one possible way to generate this log:
     </p>
-    <pre>
-          {                     {                                  {
-14.1 -> value: 14.1, -> double ->   value: 28.2,       -> ceiling ->   value: 29,          -> addOne -> { value: 30,
-      history: []                  history: [                          history: [                          history: ["double called', "ceiling called", "addOne called"] }
-    }                               "double called",                   "double called",
-                                  ]                                    "ceiling called",
-                                }                                    ]
-                                                                    }
-    </pre>
+    <div id="compose-lifted"></div>
     <p>
       From the above diagram, we see that we've modified our functions to accept <code>Log</code> objects as inputs and return
       <code>Log</code> objects as outputs. Moreover, we kick things off by wrapping our original number in an initial <code>Log</code> object.
@@ -299,12 +291,17 @@ ceiling’(11.1) // => 12</code></pre>
     <p>
       Here is a utility function that generates our initial <code>Log</code> object:
     </p>
-    <pre><code class="language-flow">function buildLog(value: number): Log {
+    <div class="row--code">
+      <div class="border-right">
+        <pre><code class="language-flow">function buildLog(value: number): Log {
   return {
     value: value,
     history: [],
   };
 }</code></pre>
+      </div>
+      <div id="build-log"></div>
+    </div>
     <p>
       We insert our given number into the <code>Log</code> object we generate. Because no relevant functions have been called yet, we initialize
       <code>history</code> to an empty array. This fresh <code>Log</code> object will be the starting point to interact with our other functions.

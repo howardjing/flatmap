@@ -16,8 +16,10 @@ import AddOneDecorated from './add-one-decorated';
 import CeilingDecorated from './ceiling-decorated';
 import ComposeDecorated from './compose-decorated';
 import DoubleModifiedAndOneNot from './double-modified-add-one-not';
+import ComposeLifted from './compose-lifted';
+import BuildLog from './build-log';
 
-import './test';
+// import './test';
 
 ReactDOM.render(<Double />, document.querySelector('#double'));
 ReactDOM.render(<AddOne />, document.querySelector('#add-one'));
@@ -34,3 +36,5 @@ ReactDOM.render(<AddOneDecorated />, document.querySelector('#add-one-decorated'
 ReactDOM.render(<CeilingDecorated />, document.querySelector('#ceiling-decorated'));
 ReactDOM.render(<ComposeDecorated />, document.querySelector('#compose-decorated'));
 ReactDOM.render(<DoubleModifiedAndOneNot />, document.querySelector('#double-modified-add-one-not'));
+ReactDOM.render(<ComposeLifted />, document.querySelector('#compose-lifted'));
+ReactDOM.render(<BuildLog />, document.querySelector('#build-log'));
