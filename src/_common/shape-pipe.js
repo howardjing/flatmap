@@ -132,10 +132,10 @@ const normalPipe = {
 }
 
 const higherOrderPipe = {
-  leftHeight: 60,
+  leftHeight: 90,
   bodyWidth: 120,
-  bodyHeight: 50,
-  rightHeight: 60,
+  bodyHeight: 60,
+  rightHeight: 90,
   color: 'purple',
 }
 

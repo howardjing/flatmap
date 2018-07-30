@@ -406,7 +406,9 @@ ceiling({ value: 3.5, history: ["fondue"] })
     <p>
       Here are the above steps translated into code form.
     </p>
-    <pre><code class="language-flow">function map(fn: (x: number) => number) {
+    <div class="row--code">
+    <div class="border-right">
+      <pre><code class="language-flow">function map(fn: (x: number) => number) {
   return function(log: Log): Log {
     const { value, history } = log;
     const newValue = fn(value);
@@ -417,17 +419,26 @@ ceiling({ value: 3.5, history: ["fondue"] })
     };
   }
 }</code></pre>
+    </div>
+      <div id="map-decorate-fn-1" style="width: 500px"></div>
+    </div>
     <p>
       Notice how similar this <code>map</code> implementation is to our manually modified functions. Here is how we can use it to generate
       <code>double’</code>, <code>addOne’</code>, and <code>ceiling’</code> dopplegangers based on our original <code>double</code>, <code>addOne</code>, and
       <code>ceiling</code> functions.
     </p>
-    <div id="map-decorate-double"></div>
-    <div id="map-decorate-add-one"></div>
-    <div id="map-decorate-ceiling"></div>
-    <pre><code class="language-flow">const double’ = map(double);
+    <div class="row--code">
+    <div class="border-right">
+      <pre><code class="language-flow">const double’ = map(double);
 const addOne’ = map(addOne);
 const ceiling’ = map(ceiling);</code></pre>
+    </div>
+    <div style="width: 500px">
+      <div id="map-decorate-double"></div>
+      <div id="map-decorate-add-one"></div>
+      <div id="map-decorate-ceiling"></div>
+    </div>
+    </div>
     <p>
       Usage of our newly generated functions is exactly the same as when we manually made them.
     </p>
@@ -589,6 +600,8 @@ map(f, map(g, buildLog(1))) // { value: 4, history: [] }</code></pre>
       tracing function calls. How can we fix this?
     </p>
     <h3>Decomposing map into two stages</h3>
+    <div id="map-decorate-fn-2"></div>
+    <div id="map-decomposed"></div>
     <p>
       Upon closer examination, our original, improperly defined <code>map</code> did two conceptually separate things.
     </p>
@@ -635,6 +648,8 @@ map(f, map(g, buildLog(1))) // { value: 4, history: [] }</code></pre>
     First, we will create a decorator function, <code>logName</code>, to encompass stage 1's logic. It will take a function in the shape of
     <code>(x: number) => number</code>, and tranform it into a function in the shape of <code>(x: number) => Log</code>.
   </p>
+  <div class="row--code">
+  <div class="border-right">
   <pre><code class="language-flow">// stage 1: create a decorator that converts a normal function
 // into one that returns a Log object
 function logName(fn: (x: number) => number) {
@@ -645,6 +660,9 @@ function logName(fn: (x: number) => number) {
     };
   }
 }</code></pre>
+  </div>
+  <div id="log-name-decorator" style="width: 500px"></div>
+  </div>
   <p>We can use it like this:</p>
   <pre><code class="language-flow">const double’ = logName(double);
 double’(3) // => { value: 6, history: ["double called"] }</code></pre>
@@ -669,6 +687,7 @@ function flatMap(g: (x: number) => Log) {
   <p>
     We can use it like this:
   </p>
+  <div id="flat-map-decorator"></div>
   <pre><code class="language-flow">const double’ = logName(double);
 const double’’ = flatMap(double’);
 double’’({ value: 3, history: ["hello!" ] })

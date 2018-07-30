@@ -23,8 +23,12 @@ import DoubleModifiedAndOneNot2 from './double-modified-add-one-not-2';
 import AddOneManuallyLifted from './add-one-manually-lifted';
 import CeilingManuallyLifted from './ceiling-manually-lifted';
 import MapDecorateDouble from './map-decorate-double';
+import MapDecorateFn from './map-decorate-fn';
 import MapDecorateAddOne from './map-decorate-add-one';
 import MapDecorateCeiling from './map-decorate-ceiling';
+import LogNameDecorator from './log-name-decorator';
+import MapDecomposed from './map-decomposed';
+import FlatMapDecorator from './flatmap-decorator';
 
 // import './test';
 
@@ -50,5 +54,10 @@ ReactDOM.render(<DoubleModifiedAndOneNot2 />, document.querySelector('#double-mo
 ReactDOM.render(<AddOneManuallyLifted />, document.querySelector('#add-one-manually-lifted'));
 ReactDOM.render(<CeilingManuallyLifted />, document.querySelector('#ceiling-manually-lifted'));
 ReactDOM.render(<MapDecorateDouble />, document.querySelector('#map-decorate-double'));
+ReactDOM.render(<MapDecorateFn />, document.querySelector('#map-decorate-fn-1'));
 ReactDOM.render(<MapDecorateAddOne />, document.querySelector('#map-decorate-add-one'));
 ReactDOM.render(<MapDecorateCeiling />, document.querySelector('#map-decorate-ceiling'));
+ReactDOM.render(<LogNameDecorator />, document.querySelector('#log-name-decorator'));
+ReactDOM.render(<MapDecorateFn />, document.querySelector('#map-decorate-fn-2'));
+ReactDOM.render(<MapDecomposed />, document.querySelector('#map-decomposed'));
+ReactDOM.render(<FlatMapDecorator />, document.querySelector('#flat-map-decorator'));
