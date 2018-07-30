@@ -283,6 +283,7 @@ ceiling’(11.1) // => 12</code></pre>
       it passed through <code>ceiling</code>, and finally <code>addOne</code>. Based on that, here is one possible way to generate this log:
     </p>
     <div id="compose-lifted"></div>
+    <pre><code class="language-flow">addOne(ceiling(double(buildLog(14.1)))) // => 30, ["double called", "ceiling called", "addOne called"]</code></pre>
     <p>
       From the above diagram, we see that we've modified our functions to accept <code>Log</code> objects as inputs and return
       <code>Log</code> objects as outputs. Moreover, we kick things off by wrapping our original number in an initial <code>Log</code> object.
@@ -309,7 +310,8 @@ ceiling’(11.1) // => 12</code></pre>
     <p>Now we must figure out how to modify our functions to accept and return logs.</p>
     <h3>A manual approach</h3>
     <p>Let's start with the manual approach.</p>
-
+    <div class="row--code">
+    <div class="border-right">
     <pre><code class="language-flow">function double(log: Log): Log {
   const { value, history } = log;
   const doubled = value * 2;
@@ -318,22 +320,23 @@ ceiling’(11.1) // => 12</code></pre>
     value: doubled,
     history: newHistory,
   };
-}
-
-double({ value: 3, history: ["cheese"] }) // => { value: 6, history: ["cheese", "double called"] }</code></pre>
+}</code></pre>
+    </div>
+    <div id="double-manually-lifted" style="width: 440px"></div>
+    </div>
+    <pre><code class="language-flow">double({ value: 3, history: ["cheese"] }) // => { value: 6, history: ["cheese", "double called"] }</code></pre>
     <p>
       Here we see our enhanced <code>double</code> function. Rather than dealing with <code>number</code> inputs and outputs, it deals with <code>Log</code> inputs
-      and outputs. As a result, it can no longer interact with <code>addOne</code> and <code>ceiling</code>.
+      and outputs. As a result, it can no longer interact with <code>addOne</code> or <code>ceiling</code>.
     </p>
-    <pre>
-{ ... } -> double -> { ... } -!-> addOne
-    </pre>
+    <div id="double-modified-add-one-not-2"></div>
     <p>
       Let's modify <code>addOne</code>, and
       <code>ceiling</code> to handle <code>Log</code>s as well.
     </p>
     <div class="row--code">
       <div class="border-right">
+        <div id="add-one-manually-lifted"></div>
         <pre><code class="language-flow">function addOne(log: Log): Log {
   const { value, history } = log;
   const plusOne = value + 1;
@@ -348,6 +351,7 @@ addOne({ value: 4, history: [] })
   // => { value: 5, history: ["addOne called"] }</code></pre>
       </div>
       <div>
+        <div id="ceiling-manually-lifted"></div>
         <pre><code class="language-flow">function ceiling(log: Log): Log {
   const { value, history } = log;
   const ceiling = Math.ceil(value);
@@ -368,11 +372,7 @@ ceiling({ value: 3.5, history: ["fondue"] })
       outputs. However, rather then tracking function calls via <code>console.log</code>, we now track function calls via <code>Log</code>
       return values.
     </p>
-    <pre>
-                        double              ceiling            addOne            double
-5.2 -> { 5.2, [] } -> ======== -> 10.4 -> ========= -> 11 -> ======== -> 12 -> ======== 24
-    </pre>
-    <pre><code class="language-flow">double(addOne(ceiling(double(5.2)))) // => 24, ["double", "ceiling", "addOne", "double"]</code></pre>
+    <pre><code class="language-flow">double(addOne(ceiling(double(buildLog(5.2))))) // => 24, ["double", "ceiling", "addOne", "double"]</code></pre>
     <p>
       There are a few drawbacks with our manual implementation. Much like when we manually added <code>console.log</code>s our original functions,
       this process is very repetitive. Moreover, there is a lot more code than simply logging a string to the console. Handling <code>Log</code>

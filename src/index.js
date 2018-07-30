@@ -18,6 +18,10 @@ import ComposeDecorated from './compose-decorated';
 import DoubleModifiedAndOneNot from './double-modified-add-one-not';
 import ComposeLifted from './compose-lifted';
 import BuildLog from './build-log';
+import DoubleManuallyLifted from './double-manually-lifted';
+import DoubleModifiedAndOneNot2 from './double-modified-add-one-not-2';
+import AddOneManuallyLifted from './add-one-manually-lifted';
+import CeilingManuallyLifted from './ceiling-manually-lifted';
 
 // import './test';
 
@@ -38,3 +42,7 @@ ReactDOM.render(<ComposeDecorated />, document.querySelector('#compose-decorated
 ReactDOM.render(<DoubleModifiedAndOneNot />, document.querySelector('#double-modified-add-one-not'));
 ReactDOM.render(<ComposeLifted />, document.querySelector('#compose-lifted'));
 ReactDOM.render(<BuildLog />, document.querySelector('#build-log'));
+ReactDOM.render(<DoubleManuallyLifted />, document.querySelector('#double-manually-lifted'));
+ReactDOM.render(<DoubleModifiedAndOneNot2 />, document.querySelector('#double-modified-add-one-not-2'));
+ReactDOM.render(<AddOneManuallyLifted />, document.querySelector('#add-one-manually-lifted'));
+ReactDOM.render(<CeilingManuallyLifted />, document.querySelector('#ceiling-manually-lifted'));
