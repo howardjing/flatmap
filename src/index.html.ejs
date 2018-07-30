@@ -672,6 +672,7 @@ double’(3) // => { value: 6, history: ["double called"] }</code></pre>
     in the shape of <code>(log: Log) => Log</code>. Note that <code>(log: Log) => Log</code> is the same shape as the
     function returned from our original uncurried <code>map</code>.
   </p>
+  <div id="flat-map-decorator"></div>
   <pre><code class="language-flow">// stage 2: glue together the new Log with the old Log
 // g is in the shape of double’ -- the output of calling logName
 function flatMap(g: (x: number) => Log) {
@@ -687,7 +688,7 @@ function flatMap(g: (x: number) => Log) {
   <p>
     We can use it like this:
   </p>
-  <div id="flat-map-decorator"></div>
+  <div id="flat-map-decorator-usage"></div>
   <pre><code class="language-flow">const double’ = logName(double);
 const double’’ = flatMap(double’);
 double’’({ value: 3, history: ["hello!" ] })

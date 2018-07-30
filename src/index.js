@@ -29,6 +29,7 @@ import MapDecorateCeiling from './map-decorate-ceiling';
 import LogNameDecorator from './log-name-decorator';
 import MapDecomposed from './map-decomposed';
 import FlatMapDecorator from './flatmap-decorator';
+import FlatMapDecoratorUsage from './flatmap-decorator-usage';
 
 // import './test';
 
@@ -61,3 +62,4 @@ ReactDOM.render(<LogNameDecorator />, document.querySelector('#log-name-decorato
 ReactDOM.render(<MapDecorateFn />, document.querySelector('#map-decorate-fn-2'));
 ReactDOM.render(<MapDecomposed />, document.querySelector('#map-decomposed'));
 ReactDOM.render(<FlatMapDecorator />, document.querySelector('#flat-map-decorator'));
+ReactDOM.render(<FlatMapDecoratorUsage />, document.querySelector('#flat-map-decorator-usage'));

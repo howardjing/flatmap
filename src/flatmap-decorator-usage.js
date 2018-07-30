@@ -12,7 +12,15 @@ const LABEL_FONT_SIZE = '24px';
 
 const shapes = [
   new PipeShape(Object.assign({}, {
-    name: 'fn',
+    name: 'double',
+  }, normalPipe)),
+  DEFAULT_ARROW,
+  new PipeShape(Object.assign({}, {
+    name: 'logName',
+  }, higherOrderPipe)),
+  DEFAULT_ARROW,
+  new PipeShape(Object.assign({}, {
+    name: 'double’',
   }, inputLiftedPipe)),
   DEFAULT_ARROW,
   new PipeShape(Object.assign({}, {
@@ -20,7 +28,7 @@ const shapes = [
   }, higherOrderPipe)),
   DEFAULT_ARROW,
   new PipeShape(Object.assign({}, {
-    name: 'fn’',
+    name: 'double’’',
   }, liftedPipe)),
 ];
 
