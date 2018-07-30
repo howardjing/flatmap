@@ -830,6 +830,23 @@ flatMap(x => flatMap(g, f(x)), { value: 2, history: ["some", "stuff" ]})
     return new Log(newValue, history.concat(newHistory));
   }
 }</code></pre>
+
+  <p>And we can use it like this: </p>
+  <pre><code class="language-flow">function logName&lt;U, V&gt;(fn: U => V): (U) => Log&lt;V&gt; {
+  return function(u: U) {
+    <%=   "return new Log(fn(u), [`${fn.name} called`]);" %>
+  }
+}
+
+function double(x) { return x * 2; }
+function addOne(x) { return x + 1; }
+
+Log.build(1)
+  .flatMap(logName(addOne))
+  .flatMap(logName(double))
+  .flatMap(x => new Log(x + 100, ["a mystery"]))
+  // => Log { value: 104, history: ["addOne called", "double called", "a mystery"] }
+  </code></pre>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-flow.min.js"></script>
   </body>

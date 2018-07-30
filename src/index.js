@@ -11,6 +11,7 @@ import AddOneAltered from './add-one-altered';
 import CeilingIncorrectlyAltered from './ceiling-incorrectly-altered';
 import ComposeAltered from './compose-altered';
 import DoubleDecorated from './double-decorated';
+import './test';
 
 ReactDOM.render(<Double />, document.querySelector('#double'));
 ReactDOM.render(<AddOne />, document.querySelector('#add-one'));
