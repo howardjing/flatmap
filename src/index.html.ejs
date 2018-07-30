@@ -199,6 +199,7 @@
 double’(3)         // => 6
 // or we can immediately invoke our new function:
 logName(double)(3) // => 6</code></pre>
+    <div id="double-decorated-use"></div>
     <p>
       Here we see that we've generated a new function <code>double’</code> based on our existing <code>double</code>. A <code>double</code> function goes
       in to the decorator, and a new function <code>double’</code> comes out of the decorator. Both functions double their input, but the new <code>double’</code>
@@ -210,12 +211,12 @@ logName(double)(3) // => 6</code></pre>
 
     <div class="row--code">
       <div class="border-right">
-        <div id="add-one-decorated"></div>
+        <div id="add-one-decorated" style="width: 436px"></div>
         <pre><code class="language-flow">const addOne’ = logName(addOne)
 addOne’(11) // => 12</code></pre>
       </div>
       <div>
-      <div id="ceiling-decorated"></div>
+      <div id="ceiling-decorated" style="width: 436px"></div>
         <pre><code class="language-flow">const ceiling’ = logName(ceiling)
 ceiling’(11.1) // => 12</code></pre>
       </div>

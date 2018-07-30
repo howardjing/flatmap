@@ -32,5 +32,5 @@ function addOne(x) { return x + 1; }
 const x = Log.build(1)
   .flatMap(logName(addOne))
   .flatMap(logName(double))
-  .flatMap(x => new Log(x + 100, ["mystery"]))
+  .flatMap(x => new Log(x + 100, ["a mystery"]))
 console.log("HI TEST", x)

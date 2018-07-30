@@ -27,7 +27,7 @@ const SideEffect = ({ shapes, label, labelWidth }: {
   });
 
   const labelXOffset = -textLabel.getWidth() / 2;
-  const labelYOffset = WIDE_ARROW.getWidth() + 20;
+  const labelYOffset = WIDE_ARROW.getWidth() + 20 - 2;
 
   return (
     <g transform={`translate(${xOffset} ${yOffset})`}>
