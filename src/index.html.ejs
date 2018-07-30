@@ -188,28 +188,22 @@
       Let's ignore this -- we use the single quote to denote that our original function has been altered.
     </p>
     <div id="double-decorated"></div>
-    <div class="row--code">
-    <div class="border-right">
     <pre><code class="language-flow">function logName(fn: (number) => number) {
   return function(x: number) {
     <%= "console.log(`${f.name} was called`);" %>
     return f(x);
   }
 }</code></pre>
-    </div>
-    <div>
-    <pre><code class="language-flow">// we can use logName as follows:
-const double’ = logName(double);
-double’(3) // => 6
-// or equivalently
+    <p>Let's use <code>logName</code> to define <code>double’</code>:
+    <pre><code class="language-flow">const double’ = logName(double);
+double’(3)         // => 6
+// or we can immediately invoke our new function:
 logName(double)(3) // => 6</code></pre>
-    </div>
-    </div>
     <p>
-      Here we see that we've generated a new function <code>double'</code> based on our existing <code>double</code>. A <code>double</code> function goes
-      in to the decorator, and a new function <code>double'</code> comes out of the decorator. Both functions double their input, but the new <code>double'</code>
+      Here we see that we've generated a new function <code>double’</code> based on our existing <code>double</code>. A <code>double</code> function goes
+      in to the decorator, and a new function <code>double’</code> comes out of the decorator. Both functions double their input, but the new <code>double’</code>
       differs from the original <code>double</code> because it logs out "double called" prior to returning its result. The original <code>double</code> does not.
-      Because both functions take in numbers as input, and return the doubled number as output, we can use the new <code>double'</code> exactly
+      Because both functions take in numbers as input, and return the doubled number as output, we can use the new <code>double’</code> exactly
       as we use the original <code>double</code>.
     </p>
     <p>Let's generate modified functions for <code>addOne</code>, and <code>ceiling</code> as well.
@@ -468,11 +462,15 @@ const ceiling’ = map(ceiling);</code></pre>
       In comparison, here are more generic versions of our <code>map</code> and <code>Log</code>:
     </p>
     <div class="row--code">
-    <pre class="border-right"><code class="language-flow">function map&lt;U, V&gt;(fn: (u: U) => V): (Log&lt;U&gt;) => Log&lt;V&gt;</code></pre>
-    <pre><code class="language-flow">type Log&lt;T&gt; = {
+    <div class="border-right">
+      <pre><code class="language-flow">function map&lt;U, V&gt;(fn: (u: U) => V): (Log&lt;U&gt;) => Log&lt;V&gt;</code></pre>
+    </div>
+    <div>
+      <pre><code class="language-flow">type Log&lt;T&gt; = {
   value: T,
   history: string[],
 };</code></pre>
+    </div>
     </div>
     <p>
       Our <code>map</code>'s type signature is the curried form of the following signature for <code>map</code> -- we can easily
@@ -529,11 +527,11 @@ function       map&lt;U, V&gt;(fn: (u: U) => V,          log: Log&lt;U&gt;): Log
       <ul>
         <li>
           A structure that wraps a value or values
-          <pre><code class="language-flow">type Functor&lt;T&gt;;</code></pre>
+          <pre><code class="language-flow">type Functor&lt;T&gt;</code></pre>
         </li>
         <li>
           A <code>map</code> function in the shape of:
-          <pre><code class="language-flow">function map&lt;U, V&gt;(fn: (u: U) => V, f: Functor&lt;U&gt;): Functor&lt;V&gt;;</code></pre>
+          <pre><code class="language-flow">map: &lt;U, V&gt;(fn: (u: U) => V, f: Functor&lt;U&gt;) => Functor&lt;V&gt;;</code></pre>
         </li>
       </ul>
     </p>
@@ -579,11 +577,10 @@ map(gThenF, buildLog(1))    // { value: 4, history: [ 'gThenF called' ] }
 
 // right hand side of composition law
 map(f, map(g, buildLog(1))) // { value: 4, history: [ 'g called', 'f called' ] }</code></pre>
-    <p>Let's adjust <code>map</code> definition to satisfy the functor laws:</p>
+    <p>Let's define a new <code>map</code> that does satisfy the functor laws:</p>
     <pre><code class="language-flow">function map&lt;U, V&gt; (fn: (u: U) => V, log: Log&lt;U&gt;): Log&lt;V&gt; {
   const { value, history } = log;
   const newValue = fn(value);
-
   // instead of generating new history, we add nothing
   const newHistory = [];
 
@@ -671,7 +668,7 @@ double’(3) // => { value: 6, history: ["double called"] }</code></pre>
   <p>
     Next, we will create a decorator function <code>flatMap</code> to encompass stage 2's gluing logic. It will convert
     a function in the shape of <code>double’</code>, <code>(x: number) => Log</code>, into a function
-    in the shape of <code>(log: Log) => Log</code>. Note that this type signature is the same shape as the
+    in the shape of <code>(log: Log) => Log</code>. Note that <code>(log: Log) => Log</code> is the same shape as the
     function returned from our original uncurried <code>map</code>.
   </p>
   <pre><code class="language-flow">// stage 2: glue together the new Log with the old Log
@@ -694,7 +691,7 @@ const double’’ = flatMap(double’);
 double’’({ value: 3, history: ["hello!" ] })
   // => { value: 6, history: ["hello!", "double called"] }</code></pre>
   <p>
-    And now finally have all the tools necessary to automatically alter our original function to accept
+    And now we finally have all the tools necessary to modify our functions to accept
     <code>Log</code>s and return <code>Log</code>s.
   </p>
   <pre><code class="language-flow">const double = (x) => x * 2;
@@ -711,33 +708,40 @@ addOne’(ceiling’(double’(buildLog(5.2))))
   <p>
     What have we gained by defining <code>flatMap</code>? We saw that when we modified our original <code>map</code>
     to obey the functor laws, our new functor <code>map</code> ceased to add tracing information to our <code>Log</code> objects.
-    We were able to get back our tracing abilities by defining <code>flatMap</code> and a helper function
-    <code>logName</code> that converted functions into a form consumable by <code>flatMap</code>. Now we will define
-    the functor law abiding <code>map</code> in terms of <code>flatMap</code> and <code>buildLog</code>.
+    We were able regain this ability by decomposing our old <code>map</code> into two different decorator functions -- <code>logName</code>
+    and <code>flatMap</code>. We saw that <code>logName</code> transforms normal functions into equivalent functions that return
+    <code>Log</code> objects, and that <code>flatMap</code> takes these altered <code>Log</code> returning functions and modifies them
+    to also accept <code>Log</code> objects as inputs. From this we can see that <code>flatMap</code> is a more powerful abstraction
+    than <code>map</code>. It allows us keep the gluing logic constant, while varying how we choose to generate <code>Log</code> objects.
   </p>
-  <pre><code class="language-flow">function functorMap(fn: (x: number) => number, log: Log) {
-  // assume flatMap is in it's uncurried form rather than the curried form we were using previously
-  return flatMap(y => buildLog(fn(y)), log);
+  <p>
+    We will now circle back to our functor law abiding <code>map</code>. We will reimplement it, but this time in terms of
+    <code>flatMap</code> and our <code>buildLog</code> utility function. As an aside, our <code>buildLog</code> function is more generally
+    known as <code>unit</code>, and it along with <code>flatMap</code> and our <code>Log</code> type are the three pieces of our
+    <code>Log</code> monad.
+  </p>
+  <pre><code class="language-flow">function functorMap(fn: (number) => number, log: Log) {
+  // assume flatMap is in its uncurried form rather than the curried form we were using above
+  return flatMap(x => buildLog(fn(x)), log);
 }</code></pre>
   <p>
     We can see it in action like this:
   </p>
-  <pre><code class="language-flow">functorMap(x => x + 1, buildTrace(3)) // => { value: 4, history: [] }</code></pre>
-  <p>Our <code>buildTrace</code> function can be more generally called <code>unit</code>.
+  <pre><code class="language-flow">functorMap(x => x + 1, buildLog(3)) // => { value: 4, history: [] }</code></pre>
   <p>
-    A monad contains three components subject to certain monad laws:
+    More generally, a monad contains three components subject to certain monad laws:
     <ul>
       <li>
         A structure that wraps a value or values
-        <pre><code class="language-flow">type Monad&lt;T&gt;;</code></pre>
+        <pre><code class="language-flow">type Monad&lt;T&gt;</code></pre>
       </li>
       <li>
         A <code>flatMap</code> function in the shape of
-        <pre><code class="language-flow">function flatMap&lt;U, V&gt;(fn: (u: U) => Monad&lt;V&gt;, f: Monad&lt;U&gt;): Monad&lt;V&gt;;</code></pre>
+        <pre><code class="language-flow">flatMap: &lt;U, V&gt;(fn: (u: U) => Monad&lt;V&gt;, f: Monad&lt;U&gt;) => Monad&lt;V&gt;;</code></pre>
       </li>
       <li>
         A <code>unit</code> function in the shape of
-        <pre><code class="language-flow">function unit&lt;T&gt;(x: T): Monad&lt;T&gt;;</code></pre>
+        <pre><code class="language-flow">unit: &lt;T&gt;(x: T) => Monad&lt;T&gt;;</code></pre>
       </li>
     </ul>
   </p>
@@ -758,7 +762,7 @@ addOne’(ceiling’(double’(buildLog(5.2))))
       </li>
     </ul>
   </p>
-  <p>Let's see the monad laws in action.</p>
+  <p>Let's see the monad laws in action. Assume we have two functions <code>f</code> and <code>g</code> as follows:</p>
   <pre><code class="language-flow">function f(x: number) {
   return {
     value: x + 2,
@@ -772,23 +776,60 @@ function g(x: number) {
     history: ["* 2"],
   }
 }</code></pre>
-  <p>Left identity:</p>
+  <p>We can evaluate both sides of the left identity law:</p>
   <pre><code class="language-flow">flatMap(f, unit(3)) // => { value: 5, history: ["a number was incremented by 2"] }
 f(3)                // => { value: 5, history: ["a number was incremented by 2"] }</code></pre>
-  <p>In this example, both sides of the equation are equivalent.</p>
-  <p>Right identity:</p>
+  <p>We can evaluate both sides of the right identity law:</p>
   <pre><code class="language-flow">flatMap(unit, { value: 2, history: ["some", "stuff"] }) // => { value: 2, history: ["some", "stuff"] }
 { value: 2, history: ["some", "stuff"] }                // => { value: 2, history: ["some", "stuff"] }</code></pre>
-  <p>In this example, both sides of the equation are equivalent.</p>
-  <p>Associativity:</p>
+  <p>We can evaluate both sides of the associativity law:</p>
   <pre><code class="language-flow">flatMap(g, flatMap(f, { value: 2, history: ["some", "stuff"] }))
   // => { value: 8, history: ["some", "stuff", "+ 2", "* 2"] }
 flatMap(x => flatMap(g, f(x)), { value: 2, history: ["some", "stuff" ]})
   // => { value: 8, history: ["some", "stuff", "+ 2", "* 2"] }</code></pre>
-  <p>In this example, both sides of the equation are equivalent.</p>
-  <p>While this doesn't constitute a strict proof, it shows us that our <code>Trace</code> monad appears to be following the monad laws.</p>
+  <p>
+    While this doesn't constitute a strict proof, it serves as a quick sanity check to show that our <code>Log</code> monad is not
+    obviously disobeying the monad laws.
+  </p>
   <h3>Idiomatic JavaScript</h3>
-  <p></p>
+  <p>
+    Up till now, our notation has not been very idiomatic JavaScript. For example, JavaScript's <code>Array.prototype.map</code> is defined directly
+    on <code>Array</code> itself. By defining <code>map</code> on <code>Array</code>, we can chain <code>map</code> calls together. This allows us to
+    read our functions in the order they execute. On the other hand, when we compose functions together, we read them inside out. For example, compare the
+    following two code snippets:
+  </p>
+  <pre><code class="language-flow">Log.build(1)
+    .flatMap(logName(double))
+    .flatMap(logName(addOne))</code></pre>
+  <p>and</p>
+  <pre><code class="language-flow">flatMap(
+  logName(addOne),
+  flatMap(
+    logName(double),
+    buildLog(1),
+  ),
+)</code></pre>
+  <p>The former style is much more common than the latter. Here is one possible implementation: </p>
+  <pre><code class="language-flow">class Log&lt;U&gt; {
+  value: U;
+  history: string[];
+
+  constructor(u: U, history: string[] = []) {
+    this.value = u;
+    this.history = history;
+  }
+
+  // our unit function
+  static build(u: U): this {
+    return new this(u);
+  }
+
+  flatMap&lt;V&gt;(fn: (u: U) => Log&lt;V&gt;): Log&lt;V&gt; {
+    const { value, history } = this;
+    const { value: newValue, history: newHistory } = fn(value);
+    return new Log(newValue, history.concat(newHistory));
+  }
+}</code></pre>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/prism.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.15.0/components/prism-flow.min.js"></script>
   </body>
