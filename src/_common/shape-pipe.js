@@ -149,7 +149,7 @@ const inputLiftedPipe = {
 
 const liftedPipe = {
   leftHeight: 80,
-  bodyWidth: 80,
+  bodyWidth: 100,
   bodyHeight: 30,
   rightHeight: 80,
   color: 'pink',

@@ -422,21 +422,15 @@ ceiling({ value: 3.5, history: ["fondue"] })
       <code>double’</code>, <code>addOne’</code>, and <code>ceiling’</code> dopplegangers based on our original <code>double</code>, <code>addOne</code>, and
       <code>ceiling</code> functions.
     </p>
-    <pre>
-    = double = -> === map === -> = double' =
-    = addOne = -> === map === -> = addOne' =
-    = ceiling = -> === ceiling === -> = ceiling' =
-    </pre>
+    <div id="map-decorate-double"></div>
+    <div id="map-decorate-add-one"></div>
+    <div id="map-decorate-ceiling"></div>
     <pre><code class="language-flow">const double’ = map(double);
 const addOne’ = map(addOne);
 const ceiling’ = map(ceiling);</code></pre>
     <p>
       Usage of our newly generated functions is exactly the same as when we manually made them.
     </p>
-    <pre>
-                        double              ceiling            addOne            double
-5.2 -> { 5.2, [] } -> ======== -> 10.4 -> ========= -> 11 -> ======== -> 12 -> ======== 24
-    </pre>
     <pre><code class="language-flow">double’(addOne’(ceiling’(double’(buildLog(5.2))))) // => 24, ["double", "ceiling", "addOne", "double"]</code></pre>
     <p>
       What have we accomplished by defining <code>map</code>? We have created a mechanism where given a function that takes numbers to numbers,

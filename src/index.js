@@ -22,6 +22,9 @@ import DoubleManuallyLifted from './double-manually-lifted';
 import DoubleModifiedAndOneNot2 from './double-modified-add-one-not-2';
 import AddOneManuallyLifted from './add-one-manually-lifted';
 import CeilingManuallyLifted from './ceiling-manually-lifted';
+import MapDecorateDouble from './map-decorate-double';
+import MapDecorateAddOne from './map-decorate-add-one';
+import MapDecorateCeiling from './map-decorate-ceiling';
 
 // import './test';
 
@@ -46,3 +49,6 @@ ReactDOM.render(<DoubleManuallyLifted />, document.querySelector('#double-manual
 ReactDOM.render(<DoubleModifiedAndOneNot2 />, document.querySelector('#double-modified-add-one-not-2'));
 ReactDOM.render(<AddOneManuallyLifted />, document.querySelector('#add-one-manually-lifted'));
 ReactDOM.render(<CeilingManuallyLifted />, document.querySelector('#ceiling-manually-lifted'));
+ReactDOM.render(<MapDecorateDouble />, document.querySelector('#map-decorate-double'));
+ReactDOM.render(<MapDecorateAddOne />, document.querySelector('#map-decorate-add-one'));
+ReactDOM.render(<MapDecorateCeiling />, document.querySelector('#map-decorate-ceiling'));
